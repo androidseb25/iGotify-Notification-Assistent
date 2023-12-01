@@ -1,1 +1,31 @@
+version: "3"
 
+services:
+  gotify:
+    image: gotify/server # Uncommand correct server image
+    # image: gotify/server-arm7
+    # image: gotify/server-arm64
+    ports:
+      - 8680:80
+    environment:
+      - GOTIFY_DEFAULTUSER_PASS=my-very-strong-password # Change me!!!!!
+      - TZ=Europe/Berlin
+    restart: unless-stopped
+    volumes:
+      - gotify-data:/app/data
+
+  igotify-notification: # (iGotify-Notification-Assistent)
+    image: ghcr.io/androidseb25/igotify-notification-assist:latest
+    pull_policy: always
+    ports:
+      - 8681:8080
+    environment:
+      - IGOTIFY_CLIENT_TOKEN="<CLIENT_TOKEN>"  # create a client in gotify an add here the client token
+      - GOTIFY_SERVER_URL="http://gotify"  # default container name from gotify server
+    restart: unless-stopped
+    volumes:
+      - igotify-notification-data:/app/data
+
+volumes:
+  gotify-data:
+  igotify-notification-data:
