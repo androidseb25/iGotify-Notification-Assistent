@@ -65,7 +65,7 @@ volumes:
 ## 🔧 Install iGotify app
 
 Download link from TestFlight: currently private beta
-for entering the private beta please send me a DM via discord @sebakaderangler
+for entering the private beta please send me a DM via discord @sebakaderangler, with you're icloud mail and reason for use.
 
 On the login screen you need to enter the Gotify Server URL and the URL from the Notification Assist, if you use the URL with a port please enter it, too! (Image 1)
 
