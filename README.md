@@ -10,29 +10,32 @@ The first App for the Gotify notification service, with background notifications
 
 ## 🔧 How to Install Gotify & iGotify-Notification-Assist
 
-### 🐳 Docker Compose
+### 🐳 Docker `compose.yaml`
 
 ```bash
 version: "3"
 
 services:
   gotify:
-    image: gotify/server # !!!ATTENTION!!! choose correct version (arm7, arm64)
+    image: gotify/server # Uncommand correct server image
+    # image: gotify/server-arm7
+    # image: gotify/server-arm64
     ports:
       - 8680:80
     environment:
-      - GOTIFY_DEFAULTUSER_PASS=SecR3T # Change ME!!!!!
+      - GOTIFY_DEFAULTUSER_PASS=my-very-strong-password # Change me!!!!!
       - TZ=Europe/Berlin
     restart: unless-stopped
     volumes:
       - gotify-data:/app/data
 
-  igotify-notification: # (iOS notification bridge)
+  igotify-notification: # (iGotify-Notification-Assistent)
     image: ghcr.io/androidseb25/igotify-notification-assist:latest
+    pull_policy: always
     ports:
       - 8681:8080
     environment:
-      - IGOTIFY_CLIENT_TOKEN="<CLIENT_TOKEN>"  # create client in gotify an add here the client token
+      - IGOTIFY_CLIENT_TOKEN="<CLIENT_TOKEN>"  # create a client in gotify an add here the client token
       - GOTIFY_SERVER_URL="http://gotify"  # default container name from gotify server
     restart: unless-stopped
     volumes:
@@ -43,6 +46,11 @@ volumes:
   igotify-notification-data:
 ```
 *Thank you The_Think3r for the compose file*
+
+1. Create a file with the name `compose.yaml` or clone this repo and go to step 3
+2. Copy the code above in the yaml file
+3. execute `docker compose up -d`
+To start the docker compose.yaml execute following command
 
 ### Needed environment variables
 
