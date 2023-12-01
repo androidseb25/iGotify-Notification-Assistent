@@ -68,14 +68,18 @@ Download link from TestFlight: currently private beta
 for entering the private beta please send me a DM via discord @sebakaderangler
 
 On the login screen you need to enter the Gotify Server URL and the URL from the Notification Assist, if you use the URL with a port please enter it, too! (Image 1)
+
 After the checks for the URL are finished and correct you need to login with your login credentials. (Image 2)
+
+&nbsp;
 
 <div style="display: flex;">
   <img alt="login_screen_urls" src="https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/login_screen_1.png" data-canonical-src="https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/login_screen_1.png" width="200" height="400" />
   <img alt="login_screen_credentials" src="https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/login_screen_2.png" data-canonical-src="https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/login_screen_2.png" width="200" height="400" />
 </div>
 
+&nbsp;
  
-And if everythink is ok, you're logged in :D 
+And if everythink is ok, you're logged in 🎉
 
 Now you receive background notifications when Gotify receives a message.
