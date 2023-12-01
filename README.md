@@ -64,6 +64,17 @@ volumes:
 
 ## 🔧 Install iGotify app
 
+### ⚠️ Attention for Ad Block user
+
+Please allow following url's to the whitelist of you're ad blocker, only when you get an alert dialog in the app, because we need it for the notification token and crash analystic.
+
+```bash
+||firebaselogging-pa.googleapis.com^
+||firebaseinstallations.googleapis.com^
+||device-provisioning.googleapis.com^
+||firebase-settings.crashlytics.com^
+```
+
 Download link from TestFlight: currently private beta
 for entering the private beta please send me a DM via discord @sebakaderangler, with you're icloud mail and reason for use.
 
