@@ -12,6 +12,21 @@ The first App for the Gotify notification service, with background notifications
 
 ### 🐳 Docker `compose.yaml`
 
+### Installation
+
+1. Create a file with the name `compose.yaml` or clone this repo and go to step 3
+2. Copy the code down below in the yaml file
+3. change environment variables in the compose file
+4. execute `docker compose up -d` to start the docker compose
+
+### Needed environment variables
+
+* `GOTIFY_DEFAULTUSER_PASS` = the user password for the defaultuser
+* `IGOTIFY_USER_TOKEN` = create a new Client under Gotify and copy the token and paste it as env variable for the docker container
+* `GOTIFY_SERVER_URL` = the domain from the gotify server
+
+&nbsp;
+
 ```bash
 version: "3"
 
@@ -46,17 +61,6 @@ volumes:
   igotify-notification-data:
 ```
 *Thank you The_Think3r for the compose file*
-
-1. Create a file with the name `compose.yaml` or clone this repo and go to step 3
-2. Copy the code above in the yaml file
-3. execute `docker compose up -d`
-To start the docker compose.yaml execute following command
-
-### Needed environment variables
-
-* `GOTIFY_DEFAULTUSER_PASS` = the user password for the defaultuser
-* `IGOTIFY_USER_TOKEN` = create a new Client under Gotify and copy the token and paste it as env variable for the docker container
-* `GOTIFY_SERVER_URL` = the domain from the gotify server
 
 ## 🔧 Install iGotify app
 
