@@ -73,6 +73,7 @@ Please allow following url's to the whitelist of you're ad blocker, only when yo
 ||firebaseinstallations.googleapis.com^
 ||device-provisioning.googleapis.com^
 ||firebase-settings.crashlytics.com^
+||crashlyticsreports-pa.googleapis.com^
 ```
 
 Download link from TestFlight: currently private beta
