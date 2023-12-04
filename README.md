@@ -10,11 +10,11 @@ The first App for the Gotify notification service, with background notifications
 
 ## 🔧 How to Install Gotify & iGotify-Notification-Assist
 
-### 🐳 Docker `compose.yaml`
+### 🐳 Docker `docker-compose.yaml`
 
 ### Installation
 
-1. Create a file with the name `compose.yaml` or clone this repo and go to step 3
+1. Create a file with the name `docker-compose.yaml` or clone this repo and go to step 3
 2. Copy the code down below in the yaml file
 3. change environment variables in the compose file
 4. execute `docker compose up -d` to start the docker compose
