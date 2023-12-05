@@ -77,6 +77,7 @@ Please allow following url's to the whitelist of you're ad blocker, only when yo
 ```
 
 Download link from TestFlight: [Public Beta](https://testflight.apple.com/join/IQbLMZxi)
+
 For Bugs or feedback please send me a PM in Discord under the name sebakaderangler or send a bug report via TestFlight.
 
 On the login screen you need to enter the Gotify Server URL and the URL from the Notification Assist, if you use the URL with a port please enter it, too! (Image 1)
