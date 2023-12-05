@@ -64,9 +64,9 @@ volumes:
 
 ## 🔧 Install iGotify app
 
-### ⚠️ Attention for Ad Block user
+### ⚠️ Attention for DNS blocker user
 
-Please allow following url's to the whitelist of you're ad blocker, only when you get an alert dialog in the app, because we need it for the notification token and crash analystic.
+Please allow following url's to the whitelist of you're DNS blocker, only when you get an alert dialog in the app, because we need it for the notification token and crash analystic.
 
 ```bash
 ||firebaselogging-pa.googleapis.com^
