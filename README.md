@@ -76,7 +76,7 @@ Please allow following url's to the whitelist of you're DNS blocker, only when y
 ||crashlyticsreports-pa.googleapis.com^
 ```
 
-Download link from TestFlight: [Public Beta](https://testflight.apple.com/join/XYZ)
+Download link from TestFlight: [Public Beta](https://testflight.apple.com/join/hvYDeyII)
 
 For Bugs or feedback please send me a PM in Discord under the name sebakaderangler or send a bug report via TestFlight.
 
