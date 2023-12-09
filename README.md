@@ -52,7 +52,7 @@ services:
     environment:
       - IGOTIFY_CLIENT_TOKEN="<CLIENT_TOKEN>"  # create a client in gotify an add here the client token
       - GOTIFY_SERVER_URL="http://gotify"  # default container name from gotify server
-    restart: unless-stopped
+    restart: always
     volumes:
       - igotify-notification-data:/app/data
 
