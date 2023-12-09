@@ -1,12 +1,11 @@
 # iGotify
 
-The first App for the Gotify notification service, with background notifications.
-
+A small Gotify server notification assistent to trigger Push Notifications to iOS Devices (App Link down below) over Firebase
 
 ## ⭐ Features
 
 * show received notifications with markdown
-* background notifications with Firebase service
+* trigger notifications with Firebase service
 
 ## 🔧 How to Install Gotify & iGotify-Notification-Assist
 
