@@ -75,7 +75,9 @@ Please allow following url's to the whitelist of you're DNS blocker, only when y
 ||crashlyticsreports-pa.googleapis.com^
 ```
 
-Download link from TestFlight: [Public Beta](https://testflight.apple.com/join/hvYDeyII)
+Download from
+
+<a href="https://apps.apple.com/de/app/igotify/id6473452512?itsct=apps_box_badge&amp;itscg=30200" style="display: inline-block; overflow: hidden; border-radius: 13px; width: 180px; height: 83px;"><img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/de-de?size=250x83&amp;releaseDate=1702425600" alt="Download on the App Store" style="border-radius: 13px; width: 180px; height: 83px;"></a>
 
 For Bugs or feedback please send me a PM in Discord under the name sebakaderangler or send a bug report via TestFlight.
 
