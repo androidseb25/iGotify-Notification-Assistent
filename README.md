@@ -75,7 +75,7 @@ Please allow following url's to the whitelist of you're DNS blocker, only when y
 ||crashlyticsreports-pa.googleapis.com^
 ```
 
-Download from
+Download from [AppStore](https://apps.apple.com/de/app/igotify/id6473452512?itsct=apps_box_badge&amp;itscg=30200)
 
 [![Download on the App Store](https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/de-de?size=350&amp;releaseDate=1702425600)](https://apps.apple.com/de/app/igotify/id6473452512?itsct=apps_box_badge&amp;itscg=30200)
 
