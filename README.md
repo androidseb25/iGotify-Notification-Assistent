@@ -87,8 +87,8 @@ After the checks for the URL are finished and correct you need to login with you
 
 &nbsp;
 
-![](https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/login_screen_1.png)
-![](https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/login_screen_2.png)
+![](https://raw.githubusercontent.com/androidseb25/iGotify-Notification-Assistent/main/login_screen_1.png)
+![](https://raw.githubusercontent.com/androidseb25/iGotify-Notification-Assistent/main/login_screen_2.png)
 
 &nbsp;
  
