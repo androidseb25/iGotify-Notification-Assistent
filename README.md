@@ -14,9 +14,10 @@ A small Gotify server notification assistent to trigger Push Notifications to iO
 ### Installation
 
 1. Create a file with the name `docker-compose.yaml` or clone this repo and go to step 3
-2. Copy the code down below in the yaml file
-3. change environment variables in the compose file
-4. execute `docker compose up -d` to start the docker compose
+2. Please use the latest and recommended version of docker and docker compose
+3. Copy the code down below in the yaml file
+4. change environment variables in the compose file
+5. execute `docker compose up -d` to start the docker compose
 
 ### Needed environment variables
 
@@ -27,7 +28,7 @@ A small Gotify server notification assistent to trigger Push Notifications to iO
 &nbsp;
 
 ```bash
-version: "3"
+version: "3.8"
 
 services:
   gotify:
