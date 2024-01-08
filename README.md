@@ -65,7 +65,21 @@ volumes:
 ```
 *Thank you The_Think3r for the compose file*
 
-#### Traefik Config
+&nbsp;
+### (Optional) NGINX Proxy Manager
+
+When someone have problem's with incoming notifications on the app, please try this options under Advance Settings for the setuped proxies
+
+```
+proxy_set_header   Host $http_host;
+proxy_connect_timeout   1m;
+proxy_send_timeout      1m;
+proxy_read_timeout      1m;
+```
+*Thank you to @TBT-TBT for sharing this notice*
+
+&nbsp;
+### Traefik Config
 
 ```
 version: "3.8"
@@ -131,7 +145,7 @@ volumes:
   gotify-data:
   igotify-notification-data:
 ```
-*Thank you to @majo1989 to sharing this config*
+*Thank you to @majo1989 for sharing this config*
 
 &nbsp;
 ## 🔧 Install iGotify app
