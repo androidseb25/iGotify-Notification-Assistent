@@ -65,6 +65,75 @@ volumes:
 ```
 *Thank you The_Think3r for the compose file*
 
+#### Traefik Config
+
+```
+version: "3.8"
+
+services:
+  gotify:
+    container_name: gotify
+    image: gotify/server
+    environment:
+      - GOTIFY_DEFAULTUSER_PASS=my-very-strong-password # Change me!!!!!
+      - TZ=Europe/Berlin
+      - GOTIFY_REGISTRATION=false
+    labels:
+      traefik.docker.network: proxy
+      traefik.enable: "true"
+      traefik.http.routers.gotify-secure.entrypoints: websecure
+      traefik.http.routers.gotify-secure.middlewares: default@file
+      traefik.http.routers.gotify-secure.rule: Host(`gotify.domain-name.de`)
+      traefik.http.routers.gotify-secure.service: gotify
+      traefik.http.routers.gotify-secure.tls: "true"
+      traefik.http.routers.gotify-secure.tls.certresolver: http_resolver
+      traefik.http.routers.gotify.entrypoints: web
+      traefik.http.routers.gotify.rule: Host(`gotify.domain-name.de`)
+      traefik.http.services.gotify.loadbalancer.server.port: "80"
+    networks:
+      default: null
+      proxy: null
+    restart: unless-stopped
+    volumes:
+      - gotify-data:/app/data
+
+  igotify-notification: # (iGotify-Notification-Assistent)
+    container_name: igotify-notification
+    image: ghcr.io/androidseb25/igotify-notification-assist:latest
+  # pull_policy: always
+    environment:
+      - IGOTIFY_CLIENT_TOKEN="<CLIENT_TOKEN>"  # create a client in gotify an add here the client token
+      - GOTIFY_SERVER_URL="http://gotify"  # default container name from gotify server
+    labels:
+      traefik.docker.network: proxy
+      traefik.enable: "true"
+      traefik.http.routers.igotify-secure.entrypoints: websecure
+      traefik.http.routers.igotify-secure.middlewares: default@file
+      traefik.http.routers.igotify-secure.rule: Host(`igotify.domain-name.de`)
+      traefik.http.routers.igotify-secure.service: igotify
+      traefik.http.routers.igotify-secure.tls: "true"
+      traefik.http.routers.igotify-secure.tls.certresolver: http_resolver
+      traefik.http.routers.igotify.entrypoints: web
+      traefik.http.routers.igotify.rule: Host(`igotify.domain-name.de`)
+      traefik.http.services.igotify.loadbalancer.server.port: "8080"
+    networks:
+      default: null
+      proxy: null
+    restart: always
+    volumes:
+      - igotify-notification-data:/app/data
+
+networks:
+  default:
+  proxy:
+    external: true
+volumes:
+  gotify-data:
+  igotify-notification-data:
+```
+*Thank you to @majo1989 to sharing this config*
+
+&nbsp;
 ## 🔧 Install iGotify app
 
 ### ⚠️ Attention for DNS blocker user
