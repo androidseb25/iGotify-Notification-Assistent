@@ -187,5 +187,5 @@ Now you receive background notifications when Gotify receives a message.
 ## HowTo's and blog article
 Please show in the [HowTo.md](https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/HowTo.md) when you need some HowTo's.
 
-If you have written own HowTo's please add and edit this file
+If you have written own HowTo's please edit this file
 
