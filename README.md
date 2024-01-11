@@ -182,3 +182,8 @@ After the checks for the URL are finished and correct you need to login with you
 And if everythink is ok, you're logged in 🎉
 
 Now you receive background notifications when Gotify receives a message.
+
+
+## 🔧 Proxmox Notifications with Gotify and iGotify
+A quick howto guid on using Proxmox 8.1 Notifications with Gotify and iGotify [Proxmox Notifications](https://homelab.casaursus.net/proxmox-notifications/)
+
