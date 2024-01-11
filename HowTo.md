@@ -1,7 +1,7 @@
 # How To Guid's
 
 ## Youtube
-* A German video about installing igotify from the German tech YouTuber RPICloud [visit YouTube](https://www.youtube.com/watch?v=hKlHL4wGgpY)
+* A German video about installing iGotify from the German tech YouTuber RPICloud [visit YouTube](https://www.youtube.com/watch?v=hKlHL4wGgpY)
 
 ## Blog article's
 ### Implementation of Gotify under Proxmox 8.1
