@@ -183,7 +183,9 @@ And if everythink is ok, you're logged in 🎉
 
 Now you receive background notifications when Gotify receives a message.
 
+&nbsp;
+## HowTo's and blog article
+Please show in the [HowTo.md](https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/HowTo.md) when you need some HowTo's.
 
-## 🔧 Proxmox Notifications with Gotify and iGotify
-A quick howto guid on using Proxmox 8.1 Notifications with Gotify and iGotify [Proxmox Notifications](https://homelab.casaursus.net/proxmox-notifications/)
+If you have written own HowTo's please add and edit this file
 
