@@ -155,7 +155,7 @@ Download from [AppStore](https://apps.apple.com/de/app/igotify/id6473452512?itsc
 
 [![Download on the App Store](https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/de-de?size=350&amp;releaseDate=1702425600)](https://apps.apple.com/de/app/igotify/id6473452512?itsct=apps_box_badge&amp;itscg=30200)
 
-For Bugs or feedback please send me a PM in Discord under the name sebakaderangler or send a bug report via TestFlight.
+For Bugs or feedback please send me a PM in Discord under the name sebakaderangler or fill out the issue formular here on GitHub.
 
 On the login screen you need to enter the Gotify Server URL and the URL from the Notification Assist, if you use the URL with a port please enter it, too! (Image 1)
 
