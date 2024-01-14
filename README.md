@@ -3,13 +3,14 @@
 
 # iGotify
 
-A small Gotify server notification assistent that decrypt the message and trigger a Push Notifications to iOS Devices via Apple's APNs (App Link down below)
+A small Gotify server notification assistent that decrypt the message and trigger a Push Notifications to iOS Devices via Apple's APNs with my service SecNtfy (App Link down below)
+SecNtfy will be available for public later this year.
 
 ## ⭐ Features
 
 * show received notifications with markdown
 * decrypted the message with a public key that is generated from the iGotify device
-* trigger notifications over Apple's APN's
+* sending the decrypted message to SecNtfy and forwarded it to Apple's APN service, without saving the payload
 
 ## 🔧 How to Install Gotify & iGotify-Notification-Assist
 
