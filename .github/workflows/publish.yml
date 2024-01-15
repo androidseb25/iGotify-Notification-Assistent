@@ -26,7 +26,7 @@ jobs:
 
     - name: Run Buildx & Push Multi Arch    
       run: |        
-        docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t ghcr.io/androidseb25/igotify-notification-assist-dev:latest -f ./Dockerfile --provenance=false --sbom=false --output type=image,push=true .
+        docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t ghcr.io/androidseb25/igotify-notification-assist:latest -f ./Dockerfile --provenance=false --sbom=false --output type=image,push=true .
 
     - name: Gotify Notification SUCCESS
       if: success()
