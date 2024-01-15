@@ -3,6 +3,10 @@
 
 # iGotify
 
+lknjöhnlkjmäpjölküölkpijhmnkälpoküüolokip+ßülp
++öü+ö+üö+öä
+
+
 A small Gotify server notification assistent to trigger Push Notifications to iOS Devices (App Link down below) over Firebase
 
 ## ⭐ Features
