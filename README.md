@@ -182,3 +182,5 @@ Please show in the [HowTo.md](https://github.com/androidseb25/iGotify-Notificati
 
 If you have written own HowTo's please edit this file
 
+## How you can help us with the project
+Take a look at the [Contributing Guide](https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/CONTRIBUTING.md) to help us with the project.
