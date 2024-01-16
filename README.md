@@ -9,12 +9,14 @@ SecNtfy will be available for public later this year.
 
 Download Link to iGotify down below
 
+&nbsp;
 ## ⭐ Features
 
 * show received notifications with markdown
 * decrypted the message with a public key that is generated from the iGotify device
 * sending the decrypted message to SecNtfy and forwarded it to Apple's APN service, without saving the payload
 
+&nbsp;
 ## 🔧 How to Install Gotify & iGotify-Notification-Assist
 
 ### 🐳 Docker `docker-compose.yaml`
@@ -27,13 +29,13 @@ Download Link to iGotify down below
 4. change environment variables in the compose file
 5. execute `docker compose up -d` to start the docker compose
 
+&nbsp;
 ### Needed environment variables
 
 * `GOTIFY_DEFAULTUSER_PASS` = the user password for the defaultuser
 * `IGOTIFY_USER_TOKEN` = create a new Client under Gotify and copy the token and paste it as env variable for the docker container
 * `GOTIFY_SERVER_URL` = the domain from the gotify server
 
-&nbsp;
 
 ```bash
 version: "3.8"
@@ -153,6 +155,10 @@ volumes:
 *Thank you to @majo1989 for sharing this config*
 
 &nbsp;
+## How you can help us with the project
+Take a look at the [Contributing Guide](https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/CONTRIBUTING.md) to help us with the project.
+
+&nbsp;
 ## 🔧 Install iGotify app
 
 Download from [AppStore](https://apps.apple.com/de/app/igotify/id6473452512?itsct=apps_box_badge&amp;itscg=30200)
@@ -182,5 +188,3 @@ Please show in the [HowTo.md](https://github.com/androidseb25/iGotify-Notificati
 
 If you have written own HowTo's please edit this file
 
-## How you can help us with the project
-Take a look at the [Contributing Guide](https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/CONTRIBUTING.md) to help us with the project.
