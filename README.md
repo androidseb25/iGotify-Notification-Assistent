@@ -180,10 +180,6 @@ volumes:
 *Thank you to @majo1989 for sharing this config*
 
 &nbsp;
-## How you can help us with the project
-Take a look at the [Contributing Guide](https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/CONTRIBUTING.md) to help us with the project.
-
-&nbsp;
 ## 🔧 Install iGotify app
 
 Download from [AppStore](https://apps.apple.com/de/app/igotify/id6473452512?itsct=apps_box_badge&amp;itscg=30200)
@@ -206,10 +202,4 @@ After the checks for the URL are finished and correct you need to login with you
 And if everythink is ok, you're logged in 🎉
 
 Now you receive background notifications when Gotify receives a message.
-
-&nbsp;
-## HowTo's and blog article
-Please show in the [HowTo.md](https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/HowTo.md) when you need some HowTo's.
-
-If you have written own HowTo's please edit this file
 
