@@ -6,7 +6,7 @@ labels: bug
 assignees: androidseb25
 
 ---
-
+1
 **Describe the bug**
 A clear and concise description of what the bug is. 
 Language of description allowed: English/German
