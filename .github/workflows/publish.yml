@@ -5,6 +5,7 @@ on:
     paths-ignore:
       - '*.md'
       - '*.yml'
+      - '*.yaml'
       - '*.png'
       - 'LICENSE'
 
