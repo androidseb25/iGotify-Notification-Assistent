@@ -1,7 +1,8 @@
 name: Build and Release dotNet
+
 on:
   pull_request:
-    types: 
+    types:
       - closed
     paths-ignore:
       - '*.md'
@@ -15,7 +16,7 @@ jobs:
     name: Release application to GitHub
     strategy:
       matrix:
-        kind: ['amd64', 'arm64', 'armv7']
+        kind: [ 'amd64', 'arm64', 'armv7' ]
         include:
           - kind: amd64
             target: linux-amd64
@@ -48,7 +49,7 @@ jobs:
         id: get-latest-tag
       - name: Get version informations
         id: infos
-        run: | 
+        run: |
           versionGit=${{ steps.get-latest-tag.outputs.tag }}
           versionProject=v$(grep '<Version>' 'iGotify Notification Assist.csproj' | cut -d '>' -f2 | cut -d '<' -f1 | xargs)
           if [ "$versionGit" != "$versionProject" -a $(git tag | grep -c "$versionProject") -eq 0 ]; then
@@ -81,6 +82,33 @@ jobs:
           asset_path: ./${{ matrix.release_name }}.zip
           asset_name: ${{ matrix.release_name }}-${{ steps.infos.outputs.version }}.zip
           asset_content_type: application/zip
+      - name: Gotify Notification SUCCESS
+        if: success()
+        uses: eikendev/gotify-action@master
+        with:
+          gotify_api_base: ${{ secrets.API_BASE }}
+          gotify_app_token: ${{ secrets.API_TOKEN }}
+          notification_title: '[RELEASE] Create & Upload'
+          notification_message: 'Release ${{ steps.infos.outputs.version }} successfully created and binaries uploaded.'
+          notification_priority: 0
+      - name: Gotify Notification FAILED
+        if: failure()
+        uses: eikendev/gotify-action@master
+        with:
+          gotify_api_base: ${{ secrets.API_BASE }}
+          gotify_app_token: ${{ secrets.API_TOKEN }}
+          notification_title: '[RELEASE] Create & Upload'
+          notification_message: 'Release ${{ steps.infos.outputs.version }} failed and binaries not uploaded.'
+          notification_priority: 10
+      - name: Gotify Notification CANCELLED
+        if: cancelled()
+        uses: eikendev/gotify-action@master
+        with:
+          gotify_api_base: ${{ secrets.API_BASE }}
+          gotify_app_token: ${{ secrets.API_TOKEN }}
+          notification_title: '[RELEASE] Create & Upload'
+          notification_message: 'Release ${{ steps.infos.outputs.version }} cancelled by user and binaries not uploaded.'
+          notification_priority: 5
 
 
   build-project:
@@ -88,8 +116,8 @@ jobs:
     name: Build dotNet
     strategy:
       matrix:
-        dotnet-version: ['8.x']
-        kind: ['amd64', 'arm64', 'armv7']
+        dotnet-version: [ '8.x' ]
+        kind: [ 'amd64', 'arm64', 'armv7' ]
         include:
           - kind: amd64
             target: linux-amd64
@@ -109,16 +137,16 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
-      
+
       - name: Display dotnet version
         run: dotnet --version
-      
+
       - name: dotNet Restore
         run: dotnet restore "./iGotify Notification Assist.csproj" --runtime ${{ matrix.target }}
-      
+
       - name: dotNet Build
         run: dotnet build "./iGotify Notification Assist.csproj" --runtime ${{ matrix.target }} -o "./${{ matrix.release_name }}/build"
-      
+
       - name: dotNet Publish
         run: dotnet publish "./iGotify Notification Assist.csproj" -c Release --runtime ${{ matrix.target }} -o "./${{ matrix.release_name }}/publish"
 
@@ -127,3 +155,30 @@ jobs:
         with:
           name: ${{ matrix.target }}
           path: "./${{ matrix.release_name }}/publish"
+      - name: Gotify Notification SUCCESS
+        if: success()
+        uses: eikendev/gotify-action@master
+        with:
+          gotify_api_base: ${{ secrets.API_BASE }}
+          gotify_app_token: ${{ secrets.API_TOKEN }}
+          notification_title: '[DOTNET] Build & Upload Artifacts'
+          notification_message: 'DotNet build successfully on target: ${{ matrix.target }}.\nArtifact uploaded.'
+          notification_priority: 0
+      - name: Gotify Notification FAILED
+        if: failure()
+        uses: eikendev/gotify-action@master
+        with:
+          gotify_api_base: ${{ secrets.API_BASE }}
+          gotify_app_token: ${{ secrets.API_TOKEN }}
+          notification_title: '[DOTNET] Build & Upload Artifacts'
+          notification_message: 'DotNet build failed on target: ${{ matrix.target }}.\nArtifact not uploaded.'
+          notification_priority: 10
+      - name: Gotify Notification CANCELLED
+        if: cancelled()
+        uses: eikendev/gotify-action@master
+        with:
+          gotify_api_base: ${{ secrets.API_BASE }}
+          gotify_app_token: ${{ secrets.API_TOKEN }}
+          notification_title: '[DOTNET] Build & Upload Artifacts'
+          notification_message: 'DotNet build cancelled by user on target: ${{ matrix.target }}.\nArtifact not uploaded.'
+          notification_priority: 5
