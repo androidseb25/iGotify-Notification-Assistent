@@ -3,13 +3,20 @@
 
 # iGotify
 
-A small Gotify server notification assistent to trigger Push Notifications to iOS Devices (App Link down below) over Firebase
+A small Gotify server notification assistent that decrypt the message and trigger a Push Notifications to iOS Devices via Apple's APNs with my service SecNtfy
 
+SecNtfy will be available for public later this year.
+
+Download Link to iGotify down below
+
+&nbsp;
 ## ⭐ Features
 
 * show received notifications with markdown
-* trigger notifications with Firebase service
+* decrypted the message with a public key that is generated from the iGotify device
+* sending the decrypted message to SecNtfy and forwarded it to Apple's APN service, without saving the payload
 
+&nbsp;
 ## 🔧 How to Install Gotify & iGotify-Notification-Assist
 
 ### 🐳 Docker `docker-compose.yaml`
@@ -22,13 +29,13 @@ A small Gotify server notification assistent to trigger Push Notifications to iO
 4. change environment variables in the compose file
 5. execute `docker compose up -d` to start the docker compose
 
+&nbsp;
 ### Needed environment variables
 
 * `GOTIFY_DEFAULTUSER_PASS` = the user password for the defaultuser
 * `IGOTIFY_USER_TOKEN` = create a new Client under Gotify and copy the token and paste it as env variable for the docker container
 * `GOTIFY_SERVER_URL` = the domain from the gotify server
 
-&nbsp;
 
 ```bash
 version: "3.8"
@@ -41,8 +48,8 @@ services:
     ports:
       - 8680:80
     environment:
-      - GOTIFY_DEFAULTUSER_PASS=my-very-strong-password # Change me!!!!!
-      - TZ=Europe/Berlin
+      GOTIFY_DEFAULTUSER_PASS:   'my-very-strong-password' # Change me!!!!!
+      TZ:                        'Europe/Berlin'
     restart: unless-stopped
     volumes:
       - gotify-data:/app/data
@@ -53,8 +60,8 @@ services:
     ports:
       - 8681:8080
     environment:
-      - IGOTIFY_CLIENT_TOKEN="<CLIENT_TOKEN>"  # create a client in gotify an add here the client token
-      - GOTIFY_SERVER_URL="http://gotify"  # default container name from gotify server
+      IGOTIFY_CLIENT_TOKEN:  '<CLIENT_TOKEN>'  # create a client in gotify an add here the client token
+      GOTIFY_SERVER_URL:     'http://gotify'   # default container name from gotify server
     restart: always
     volumes:
       - igotify-notification-data:/app/data
@@ -89,9 +96,9 @@ services:
     container_name: gotify
     image: gotify/server
     environment:
-      - GOTIFY_DEFAULTUSER_PASS=my-very-strong-password # Change me!!!!!
-      - TZ=Europe/Berlin
-      - GOTIFY_REGISTRATION=false
+      GOTIFY_DEFAULTUSER_PASS:   'my-very-strong-password' # Change me!!!!!
+      TZ:                        'Europe/Berlin'
+      GOTIFY_REGISTRATION:       'false'
     labels:
       traefik.docker.network: proxy
       traefik.enable: "true"
@@ -114,10 +121,10 @@ services:
   igotify-notification: # (iGotify-Notification-Assistent)
     container_name: igotify-notification
     image: ghcr.io/androidseb25/igotify-notification-assist:latest
-  # pull_policy: always
+    pull_policy: always
     environment:
-      - IGOTIFY_CLIENT_TOKEN="<CLIENT_TOKEN>"  # create a client in gotify an add here the client token
-      - GOTIFY_SERVER_URL="http://gotify"  # default container name from gotify server
+      IGOTIFY_CLIENT_TOKEN:  '<CLIENT_TOKEN>'  # create a client in gotify an add here the client token
+      GOTIFY_SERVER_URL:     'http://gotify'   # default container name from gotify server
     labels:
       traefik.docker.network: proxy
       traefik.enable: "true"
@@ -148,25 +155,17 @@ volumes:
 *Thank you to @majo1989 for sharing this config*
 
 &nbsp;
+## How you can help us with the project
+Take a look at the [Contributing Guide](https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/CONTRIBUTING.md) to help us with the project.
+
+&nbsp;
 ## 🔧 Install iGotify app
-
-### ⚠️ Attention for DNS blocker user
-
-Please allow following url's to the whitelist of you're DNS blocker, only when you get an alert dialog in the app, because we need it for the notification token and crash analystic.
-
-```bash
-||firebaselogging-pa.googleapis.com^
-||firebaseinstallations.googleapis.com^
-||device-provisioning.googleapis.com^
-||firebase-settings.crashlytics.com^
-||crashlyticsreports-pa.googleapis.com^
-```
 
 Download from [AppStore](https://apps.apple.com/de/app/igotify/id6473452512?itsct=apps_box_badge&amp;itscg=30200)
 
 [![Download on the App Store](https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/de-de?size=350&amp;releaseDate=1702425600)](https://apps.apple.com/de/app/igotify/id6473452512?itsct=apps_box_badge&amp;itscg=30200)
 
-For Bugs or feedback please send me a PM in Discord under the name sebakaderangler or send a bug report via TestFlight.
+For Bugs or feedback please send me a PM in Discord under the name sebakaderangler or fill out the issue formular here on GitHub.
 
 On the login screen you need to enter the Gotify Server URL and the URL from the Notification Assist, if you use the URL with a port please enter it, too! (Image 1)
 
