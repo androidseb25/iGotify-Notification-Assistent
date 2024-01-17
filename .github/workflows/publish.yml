@@ -21,6 +21,11 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v2
 
+    - name: Extract branch name
+      shell: bash
+      run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+      id: extract_branch
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3      
       with:
@@ -33,9 +38,15 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.DOCKER_GIT_SEC }}
 
-    - name: Run Buildx & Push Multi Arch    
+    - name: Run Buildx & Push Multi Arch for dev
+      if: steps.extract_branch.outputs.branch == 'dev'
       run: |        
         docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t ghcr.io/androidseb25/igotify-notification-assist-dev:latest -f ./Dockerfile --provenance=false --sbom=false --output type=image,push=true .
+
+    - name: Run Buildx & Push Multi Arch for public
+      if: steps.extract_branch.outputs.branch != 'dev'
+      run: |        
+        docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t ghcr.io/androidseb25/igotify-notification-assist:latest -f ./Dockerfile --provenance=false --sbom=false --output type=image,push=true .
 
     - name: Gotify Notification SUCCESS
       if: success()
