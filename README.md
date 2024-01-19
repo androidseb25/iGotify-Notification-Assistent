@@ -85,6 +85,8 @@ proxy_read_timeout      1m;
 ```
 *Thank you to @TBT-TBT for sharing this notice*
 
+Also **don't** check the boxes which say "HTTP/2 Support" and "HSTS enabled".
+
 &nbsp;
 ### Traefik Config
 
