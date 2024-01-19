@@ -98,6 +98,9 @@ proxy_connect_timeout   1m;
 proxy_send_timeout      1m;
 proxy_read_timeout      1m;
 ```
+
+Also **don't** check the boxes which say "HTTP/2 Support" and "HSTS enabled".
+
 *Thank you to @TBT-TBT for sharing this notice*
 
 &nbsp;
