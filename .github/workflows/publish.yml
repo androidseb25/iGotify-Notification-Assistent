@@ -14,7 +14,7 @@ on: [ push ]
 
 jobs:
   build_arm64_images:
-    if: github.event.pull_request.merged == true
+    #if: github.event.pull_request.merged == true
     name: "Build Multi Arch Images"
     runs-on: ubuntu-latest
     steps:
