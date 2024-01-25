@@ -78,4 +78,13 @@ public class DeviceController : ControllerBase
         
         return Ok(new { Message = result, Successful = resultBool });
     }
+    
+    [HttpGet("Test/{deviceToken}")]
+    public IActionResult Test(string deviceToken)
+    {
+        if (deviceToken.Length > 0)
+            _ = Tool.SendNotification(deviceToken, "Test", "Test Nachricht", false, "", 0);
+
+        return Ok();
+    }
 }

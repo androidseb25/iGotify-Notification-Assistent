@@ -38,66 +38,92 @@ Download Link to iGotify down below
 
 
 ```bash
-version: "3.8"
+version: '3.8'
 
 services:
   gotify:
-    image: gotify/server # Uncommand correct server image
+    container_name: gotify
+    hostname: gotify
+    image: gotify/server          # Uncommand correct server image
     # image: gotify/server-arm7
     # image: gotify/server-arm64
-    ports:
-      - 8680:80
-    environment:
-      GOTIFY_DEFAULTUSER_PASS:   'my-very-strong-password' # Change me!!!!!
-      TZ:                        'Europe/Berlin'
     restart: unless-stopped
-    volumes:
-      - gotify-data:/app/data
-
-  igotify-notification: # (iGotify-Notification-Assistent)
-    image: ghcr.io/androidseb25/igotify-notification-assist:latest
-    pull_policy: always
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - net
     ports:
-      - 8681:8080
-    environment:
-      IGOTIFY_CLIENT_TOKEN:  '<CLIENT_TOKEN>'  # create a client in gotify an add here the client token
-      GOTIFY_SERVER_URL:     'http://gotify'   # default container name from gotify server
-    restart: always
+      - "8680:80"
     volumes:
-      - igotify-notification-data:/app/data
+      - data:/app/data
+    environment:
+      TZ:                       'Europe/Berlin'
+      GOTIFY_DEFAULTUSER_PASS:  'my-very-strong-password'   # Change me!!!!!
+
+  igotify:
+    container_name: igotify
+    hostname: igotify
+    image: ghcr.io/androidseb25/igotify-notification-assist:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    pull_policy: always
+    networks:
+      - net
+    ports:
+      - "8681:8080"
+    volumes:
+      - api-data:/app/data
+    environment:
+      IGOTIFY_CLIENT_TOKEN:   '<CLIENT_TOKEN>'  # create a client in gotify an add here the client token
+      GOTIFY_SERVER_URL:      'http://gotify'   # default container name from gotify server
+
+networks:
+  net:
 
 volumes:
-  gotify-data:
-  igotify-notification-data:
+  data:
+  api-data:
 ```
-*Thank you The_Think3r for the compose file*
+*Thank you The_Think3r for the compose file and @herrpandora*
 
 &nbsp;
 ### (Optional) NGINX Proxy Manager
 
 When someone have problem's with incoming notifications on the app, please try this options under Advance Settings for the setuped proxies
 
-```
+```bash
 proxy_set_header   Host $http_host;
 proxy_connect_timeout   1m;
 proxy_send_timeout      1m;
 proxy_read_timeout      1m;
 ```
+
+Also **don't** check the boxes which say "HTTP/2 Support" and "HSTS enabled".
+
 *Thank you to @TBT-TBT for sharing this notice*
 
 &nbsp;
 ### Traefik Config
 
-```
+```bash
 version: "3.8"
 
 services:
   gotify:
     container_name: gotify
-    image: gotify/server
+    hostname: gotify
+    image: gotify/server          # Uncommand correct server image
+    # image: gotify/server-arm7
+    # image: gotify/server-arm64
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - data:/app/data
     environment:
-      GOTIFY_DEFAULTUSER_PASS:   'my-very-strong-password' # Change me!!!!!
-      TZ:                        'Europe/Berlin'
+      TZ:                       'Europe/Berlin'
+      GOTIFY_DEFAULTUSER_PASS:  'my-very-strong-password'   # Change me!!!!!
       GOTIFY_REGISTRATION:       'false'
     labels:
       traefik.docker.network: proxy
@@ -114,17 +140,22 @@ services:
     networks:
       default: null
       proxy: null
-    restart: unless-stopped
     volumes:
-      - gotify-data:/app/data
+      - data:/app/data
 
   igotify-notification: # (iGotify-Notification-Assistent)
-    container_name: igotify-notification
+    container_name: igotify
+    hostname: igotify
     image: ghcr.io/androidseb25/igotify-notification-assist:latest
+    restart: always
+    security_opt:
+      - no-new-privileges:true
     pull_policy: always
+    volumes:
+      - api-data:/app/data
     environment:
-      IGOTIFY_CLIENT_TOKEN:  '<CLIENT_TOKEN>'  # create a client in gotify an add here the client token
-      GOTIFY_SERVER_URL:     'http://gotify'   # default container name from gotify server
+      IGOTIFY_CLIENT_TOKEN:   '<CLIENT_TOKEN>'  # create a client in gotify an add here the client token
+      GOTIFY_SERVER_URL:      'http://gotify'   # default container name from gotify server
     labels:
       traefik.docker.network: proxy
       traefik.enable: "true"
@@ -140,23 +171,16 @@ services:
     networks:
       default: null
       proxy: null
-    restart: always
-    volumes:
-      - igotify-notification-data:/app/data
 
 networks:
   default:
   proxy:
     external: true
 volumes:
-  gotify-data:
-  igotify-notification-data:
+  data:
+  api-data:
 ```
 *Thank you to @majo1989 for sharing this config*
-
-&nbsp;
-## How you can help us with the project
-Take a look at the [Contributing Guide](https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/CONTRIBUTING.md) to help us with the project.
 
 &nbsp;
 ## 🔧 Install iGotify app
@@ -181,10 +205,4 @@ After the checks for the URL are finished and correct you need to login with you
 And if everythink is ok, you're logged in 🎉
 
 Now you receive background notifications when Gotify receives a message.
-
-&nbsp;
-## HowTo's and blog article
-Please show in the [HowTo.md](https://github.com/androidseb25/iGotify-Notification-Assistent/blob/main/HowTo.md) when you need some HowTo's.
-
-If you have written own HowTo's please edit this file
 
