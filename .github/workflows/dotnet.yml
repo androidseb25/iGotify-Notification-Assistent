@@ -100,7 +100,7 @@ jobs:
           gotify_app_token: ${{ secrets.API_TOKEN }}
           notification_title: '[RELEASE] Create & Upload'
           notification_message: 'Release ${{ steps.infos.outputs.version }} failed and binaries not uploaded.'
-          notification_priority: 10
+          notification_priority: 9
       - name: Gotify Notification CANCELLED
         if: cancelled()
         uses: eikendev/gotify-action@master
@@ -173,7 +173,7 @@ jobs:
           gotify_app_token: ${{ secrets.API_TOKEN }}
           notification_title: '[DOTNET] Build & Upload Artifacts'
           notification_message: 'DotNet build failed on target: ${{ matrix.target }}.\nArtifact not uploaded.'
-          notification_priority: 10
+          notification_priority: 9
       - name: Gotify Notification CANCELLED
         if: cancelled()
         uses: eikendev/gotify-action@master
