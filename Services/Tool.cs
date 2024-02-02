@@ -133,6 +133,27 @@ public class Tool
             return "";
         }
     }
+
+    public static async Task<bool> CheckIfUrlReachable(string url)
+    {
+        var clientHandler = new HttpClientHandler();
+        var client = new HttpClient(clientHandler);
+
+        url = url.Replace("api.", "").Replace("/api", "");
+        
+        var myRequest = new HttpRequestMessage(HttpMethod.Get, url);
+        
+        try
+        {
+            var response = client.SendAsync(myRequest).GetAwaiter().GetResult();
+            var result = response.Content.ReadAsStringAsync().Result;
+            return response.StatusCode == HttpStatusCode.OK;
+        }
+        catch (WebException)
+        {
+            return false;
+        }
+    }
 }
 
 /// <summary>

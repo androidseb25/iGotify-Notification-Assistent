@@ -45,7 +45,7 @@ public class GotifySocketService
     /// <summary>
     /// Initialise WebSocket with all passed variables from container
     /// </summary>
-    public void Start()
+    public async void Start()
     {
         // Get the current process.
         Process currentProcess = Process.GetCurrentProcess();
@@ -64,22 +64,26 @@ public class GotifySocketService
         }
         else
             socket = envGotifyServUrl.Contains("http://") ? "ws" : "wss";
-
-        gotifyServerUrl = envGotifyServUrl.Replace("http://", "").Replace("https://", "").Replace("\"", "");
-
+        
 #if DEBUG
         iGotifyClientToken = "<CLIENT_TOKEN>";
         socket = "ws"; // or "wss" for secure websocket connection
         gotifyServerUrl = "0.0.0.0:8680"; // example url IP OR DOMAIN OF GOTIFY INSTANCE WITH PORT
-        url = $"{socket}://{gotifyServerUrl}/stream?token={iGotifyClientToken}"; 
 #else
         iGotifyClientToken = Environment.GetEnvironmentVariable("IGOTIFY_CLIENT_TOKEN").Replace("\"", "");
-        url = $"{socket}://{gotifyServerUrl}/stream?token={iGotifyClientToken}";
 #endif
 
-        Console.WriteLine($"Client - Token: {iGotifyClientToken}");
+        string isGotifyAvailable = await Tool.CheckIfUrlReachable(gotifyServerUrl) ? "yes" : "no";
+        string isSecNtfyAvailable = await Tool.CheckIfUrlReachable(secntfyUrl) ? "yes" : "no";
+
+        gotifyServerUrl = envGotifyServUrl.Replace("http://", "").Replace("https://", "").Replace("\"", "");
+        url = $"{socket}://{gotifyServerUrl}/stream?token={iGotifyClientToken}"; 
+        
         Console.WriteLine($"Gotify - Url: {url}");
+        Console.WriteLine($"Is Gotify - Url available: {isGotifyAvailable}");
         Console.WriteLine($"SecNtfy Server - Url: {secntfyUrl}");
+        Console.WriteLine($"Is SecNtfy Server - Url available: {isSecNtfyAvailable}");
+        Console.WriteLine($"Client - Token: {iGotifyClientToken}");
 
         try
         {
