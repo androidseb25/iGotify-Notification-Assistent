@@ -8,7 +8,7 @@ using iGotify_Notification_Assist.Helpers;
 using iGotify_Notification_Assist.Models;
 using Newtonsoft.Json;
 
-namespace iGotify_Notification_Assist;
+namespace iGotify_Notification_Assist.Services;
 
 public class Tool
 {
@@ -163,4 +163,12 @@ public class GetLocationsOf
 {
     public static readonly string? App =
         Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+}
+
+public class GetConnectionString
+{
+    public static string? UsersDb(string databaseFilePath)
+    {
+        return $"Data Source={databaseFilePath}";
+    }
 }

@@ -1,3 +1,5 @@
+using iGotify_Notification_Assist.Models;
+using iGotify_Notification_Assist.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace iGotify_Notification_Assist.Controller;
@@ -24,10 +26,15 @@ public class DeviceController : ControllerBase
         string result = "";
         bool resultBool = false;
         
-        Console.WriteLine($"TOKEN: {deviceModel.DM_TOKEN}");
-        Console.WriteLine($"DEVICE: {deviceModel.DM_NAME}");
+        Console.WriteLine($"ClientToken: {deviceModel.ClientToken}");
+        Console.WriteLine($"DeviceToken: {deviceModel.DeviceToken}");
+        Console.WriteLine($"GotifyUrl: {deviceModel.GotifyUrl}");
 
-        if (deviceModel.DM_TOKEN!.Length == 0 || deviceModel.DM_TOKEN.Length < 60 || deviceModel.DM_TOKEN == "string")
+        if (
+            deviceModel.ClientToken!.Length == 0 || deviceModel.ClientToken == "string" ||
+            deviceModel.DeviceToken!.Length == 0 || deviceModel.DeviceToken.Length < 60 || deviceModel.DeviceToken == "string" ||
+            deviceModel.GotifyUrl!.Length == 0 || deviceModel.GotifyUrl == "string"
+            )
         {
             result = "Fehler beim hinzugefügen des Gerätes!";
             resultBool = false;
@@ -36,6 +43,8 @@ public class DeviceController : ControllerBase
         
         if (await deviceModel.Insert())
         {
+            GotifySocketService gss = GotifySocketService.getInstance();
+            gss.StartWSThread(deviceModel.GotifyUrl, deviceModel.ClientToken);
             result = "Gerät erfolgreich hinzugefügt";
             resultBool = true;
         } else {
@@ -66,9 +75,15 @@ public class DeviceController : ControllerBase
         }
 
         DeviceModel deviceModel = new DeviceModel();
-        deviceModel.DM_TOKEN = token;
+        deviceModel.DeviceToken = token;
+        Users usr = await DatabaseService.GetUser(token);
         if (await deviceModel.Delete())
         {
+            if (usr.Uid > 0)
+            {
+                GotifySocketService gss = GotifySocketService.getInstance();
+                gss.KillWsThread(usr.ClientToken);
+            }
             result = "Gerät erfolgreich gelöscht";
             resultBool = true;
         } else {

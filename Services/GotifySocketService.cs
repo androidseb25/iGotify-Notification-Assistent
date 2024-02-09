@@ -1,15 +1,16 @@
-using System.Diagnostics;
 using System.Net.WebSockets;
+using iGotify_Notification_Assist.Models;
 
-namespace iGotify_Notification_Assist;
+namespace iGotify_Notification_Assist.Services;
 
 public class GotifySocketService
 {
     public bool isInit { get; set; }
 
-    public WebSockClient? wsc { get; set; }
-
     private static GotifySocketService? _instance = null;
+
+    // Datenstruktur zur Verfolgung von Threads und WebSocket-Verbindungen
+    private static readonly Dictionary<string, WebSockClient> WebsocketThreads = new Dictionary<string, WebSockClient>();
 
     public GotifySocketService() { }
 
@@ -20,26 +21,64 @@ public class GotifySocketService
         return _instance;
     }
     
-    public void Init()
+    public async void Init()
     {
         string path = $"{GetLocationsOf.App}/data";
-        string tokenFile = Path.Combine(path, "igotify-token.txt");
+        //Create Database File
+        bool isDbFileExists = DatabaseService.CreateDatebase(path);
+        isInit = isDbFileExists;
+    }
 
-        bool isFileCreated = File.Exists(tokenFile);
+    public void KillWsThread(string clientToken)
+    {
+        WebSockClient wsc = new WebSockClient();
+        WebsocketThreads.TryGetValue(clientToken, out wsc);
 
-        // is file created? No created it now
-        if (!isFileCreated)
+        if (wsc != null)
         {
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-            // Create() creates a file at pathName 
-            _ = File.Create(tokenFile);
-            isFileCreated = File.Exists(tokenFile);
+            wsc.Stop();
+            WebsocketThreads.Remove(clientToken);
         }
+    }
 
-        // check if myFile.txt file is created at the specified path 
-        Console.WriteLine(isFileCreated ? "File is created." : "File is not created.");
-        isInit = isFileCreated;
+    public void StartWSThread(string gotifyServerUrl, string clientToken)
+    {
+        Thread thread = new Thread(() => StartWSConn(gotifyServerUrl, clientToken));
+        thread.Start();
+    }
+
+    private void StartWSConn(string gotifyServerUrl, string clientToken)
+    {
+        while (true)
+        {
+            try
+            {
+                string? wsUrl = "";
+                string? socket = "";
+                
+                socket = gotifyServerUrl.Contains("http://") ? "ws" : "wss";
+                gotifyServerUrl = gotifyServerUrl.Replace("http://", "").Replace("https://", "").Replace("\"", "");
+                wsUrl = $"{socket}://{gotifyServerUrl}/stream?token={clientToken}"; 
+                
+                // Starting WebSocket instance
+                Console.WriteLine("Client connecting...");
+                WebSockClient wsc = new WebSockClient();
+                wsc.URL = wsUrl;
+                wsc.Start(clientToken);
+                // Connect the client
+
+                // Fügen Sie den Thread und die zugehörige WebSocket-Verbindung zur Datenstruktur hinzu
+                WebsocketThreads.Add(clientToken, wsc);
+                
+                Thread.Sleep(Timeout.Infinite);
+            }
+            catch (WebSocketException wse)
+            {
+                Console.WriteLine($"Unable to Connect to WS or WSS connection aborted with clientToken: {clientToken}");
+                Console.WriteLine(wse.StackTrace);
+                //currentProcess.Kill(true);
+            }
+        }
     }
 
     /// <summary>
@@ -47,59 +86,22 @@ public class GotifySocketService
     /// </summary>
     public async void Start()
     {
-        // Get the current process.
-        Process currentProcess = Process.GetCurrentProcess();
-        
-        string? url = "";
-        string? iGotifyClientToken = "";
-        string? socket = "";
-        string gotifyServerUrl = "";
-
-        string? envGotifyServUrl = Environment.GetEnvironmentVariable("GOTIFY_SERVER_URL");
         string? secntfyUrl = Environment.GetEnvironmentVariable("SECNTFY_SERVER_URL") ?? "https://api.secntfy.app/api";
-        if (envGotifyServUrl == null)
+
+        List<Users> userList = await DatabaseService.GetUsers();
+
+        foreach (Users user in userList)
         {
-            envGotifyServUrl = "http://gotify";
-            socket = "ws";
-        }
-        else
-            socket = envGotifyServUrl.Contains("http://") ? "ws" : "wss";
+            string isGotifyAvailable = await Tool.CheckIfUrlReachable(user.GotifyUrl) ? "yes" : "no";
+            string isSecNtfyAvailable = await Tool.CheckIfUrlReachable(secntfyUrl) ? "yes" : "no";
         
-#if DEBUG
-        iGotifyClientToken = "<CLIENT_TOKEN>";
-        socket = "ws"; // or "wss" for secure websocket connection
-        gotifyServerUrl = "0.0.0.0:8680"; // example url IP OR DOMAIN OF GOTIFY INSTANCE WITH PORT
-#else
-        iGotifyClientToken = Environment.GetEnvironmentVariable("IGOTIFY_CLIENT_TOKEN").Replace("\"", "");
-#endif
-
-        string isGotifyAvailable = await Tool.CheckIfUrlReachable(gotifyServerUrl) ? "yes" : "no";
-        string isSecNtfyAvailable = await Tool.CheckIfUrlReachable(secntfyUrl) ? "yes" : "no";
-
-        gotifyServerUrl = envGotifyServUrl.Replace("http://", "").Replace("https://", "").Replace("\"", "");
-        url = $"{socket}://{gotifyServerUrl}/stream?token={iGotifyClientToken}"; 
-        
-        Console.WriteLine($"Gotify - Url: {url}");
-        Console.WriteLine($"Is Gotify - Url available: {isGotifyAvailable}");
-        Console.WriteLine($"SecNtfy Server - Url: {secntfyUrl}");
-        Console.WriteLine($"Is SecNtfy Server - Url available: {isSecNtfyAvailable}");
-        Console.WriteLine($"Client - Token: {iGotifyClientToken}");
-
-        try
-        {
-            // Starting WebSocket instance
-            Console.Write("Client connecting...");
-            wsc = new WebSockClient();
-            wsc.URL = url;
-            wsc.Start();
-            // Connect the client
-            Console.WriteLine("Done!");
-        }
-        catch (WebSocketException wse)
-        {
-            Console.WriteLine($"Unable to Connect to WS or WSS connection aborted");
-            Console.WriteLine(wse.StackTrace);
-            //currentProcess.Kill(true);
+            Console.WriteLine($"Gotify - Url: {user.GotifyUrl}");
+            Console.WriteLine($"Is Gotify - Url available: {isGotifyAvailable}");
+            Console.WriteLine($"SecNtfy Server - Url: {secntfyUrl}");
+            Console.WriteLine($"Is SecNtfy Server - Url available: {isSecNtfyAvailable}");
+            Console.WriteLine($"Client - Token: {user.ClientToken}");
+            
+            StartWSThread(user.GotifyUrl, user.ClientToken);
         }
     }
 }

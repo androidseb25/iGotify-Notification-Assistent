@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Security.Cryptography;
 using iGotify_Notification_Assist.Helpers;
+using iGotify_Notification_Assist.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace iGotify_Notification_Assist.Controller;
