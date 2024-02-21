@@ -26,6 +26,7 @@ public class GotifySocketService
         string path = $"{GetLocationsOf.App}/data";
         //Create Database File
         bool isDbFileExists = DatabaseService.CreateDatebase(path);
+        Console.WriteLine($"Database is created: {isDbFileExists}");
         isInit = isDbFileExists;
     }
 

@@ -64,7 +64,7 @@ public class DatabaseService
         return isExists;
     }
 
-    public static async Task<bool> DeleteUser(string deviceToken)
+    public static async Task<bool> DeleteUser(string clientToken)
     {
         string path = $"{GetLocationsOf.App}/data";
         //Create Database File
@@ -79,7 +79,7 @@ public class DatabaseService
                 dbConnection.Open();
 
                 // Create a sample table
-                string deleteQuery = $"delete from Users where DeviceToken = '{deviceToken}';";
+                string deleteQuery = $"delete from Users where ClientToken = '{clientToken}';";
                 var rows = await dbConnection.ExecuteAsync(deleteQuery);
 
                 isDeleted = rows > 0;

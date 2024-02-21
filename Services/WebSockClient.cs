@@ -46,7 +46,7 @@ public class WebSockClient
             {
                 Console.WriteLine($"Connection lost reconnect to Websocket...");
                 Stop();
-                Start(clientToken);
+                Start(ws.Name);
             }
         });
         

@@ -75,7 +75,7 @@ public class DeviceController : ControllerBase
         }
 
         DeviceModel deviceModel = new DeviceModel();
-        deviceModel.DeviceToken = token;
+        deviceModel.ClientToken = token;
         Users usr = await DatabaseService.GetUser(token);
         if (await deviceModel.Delete())
         {

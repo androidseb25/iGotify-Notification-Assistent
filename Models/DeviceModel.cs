@@ -27,7 +27,7 @@ public class DeviceModel
     /// <returns></returns>
     public async Task<bool> Delete()
     {
-        return await DatabaseService.DeleteUser(this.DeviceToken);
+        return await DatabaseService.DeleteUser(this.ClientToken);
     }
 
     /// <summary>
