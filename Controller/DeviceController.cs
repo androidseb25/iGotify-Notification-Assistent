@@ -67,7 +67,7 @@ public class DeviceController : ControllerBase
         bool resultBool = false;
         
         Console.WriteLine($"Delete Token: {token}");
-        if (token.Length == 0 || token.Length < 60 || token == "string")
+        if (token.Length == 0 || token == "string")
         {
             result = "Fehler beim löschen des Gerätes!";
             resultBool = false;
