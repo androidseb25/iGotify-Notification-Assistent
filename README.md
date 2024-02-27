@@ -33,8 +33,6 @@ Download Link to iGotify down below
 ### Needed environment variables
 
 * `GOTIFY_DEFAULTUSER_PASS` = the user password for the defaultuser
-* `IGOTIFY_USER_TOKEN` = create a new Client under Gotify and copy the token and paste it as env variable for the docker container
-* `GOTIFY_SERVER_URL` = the domain from the gotify server
 
 
 ```bash
@@ -74,9 +72,6 @@ services:
       - "8681:8080"
     volumes:
       - api-data:/app/data
-    environment:
-      IGOTIFY_CLIENT_TOKEN:   '<CLIENT_TOKEN>'  # create a client in gotify an add here the client token
-      GOTIFY_SERVER_URL:      'http://gotify'   # default container name from gotify server
 
 networks:
   net:
@@ -153,9 +148,6 @@ services:
     pull_policy: always
     volumes:
       - api-data:/app/data
-    environment:
-      IGOTIFY_CLIENT_TOKEN:   '<CLIENT_TOKEN>'  # create a client in gotify an add here the client token
-      GOTIFY_SERVER_URL:      'http://gotify'   # default container name from gotify server
     labels:
       traefik.docker.network: proxy
       traefik.enable: "true"
