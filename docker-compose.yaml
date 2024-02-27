@@ -34,9 +34,6 @@ services:
       - "8681:8080"
     volumes:
       - api-data:/app/data
-    environment:
-      IGOTIFY_CLIENT_TOKEN:   '<CLIENT_TOKEN>'  # create a client in gotify an add here the client token
-      GOTIFY_SERVER_URL:      'http://gotify'   # default container name from gotify server
 
 networks:
   net:
