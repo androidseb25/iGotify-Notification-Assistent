@@ -8,7 +8,7 @@ using iGotify_Notification_Assist.Helpers;
 using iGotify_Notification_Assist.Models;
 using Newtonsoft.Json;
 
-namespace iGotify_Notification_Assist;
+namespace iGotify_Notification_Assist.Services;
 
 public class Tool
 {
@@ -133,6 +133,27 @@ public class Tool
             return "";
         }
     }
+
+    public static async Task<bool> CheckIfUrlReachable(string url)
+    {
+        var clientHandler = new HttpClientHandler();
+        var client = new HttpClient(clientHandler);
+
+        url = url.Replace("api.", "").Replace("/api", "");
+        
+        var myRequest = new HttpRequestMessage(HttpMethod.Get, url);
+        await Task.Run(() => { });
+        try
+        {
+            var response = client.SendAsync(myRequest).GetAwaiter().GetResult();
+            var result = response.Content.ReadAsStringAsync().Result;
+            return response.StatusCode == HttpStatusCode.OK;
+        }
+        catch (WebException)
+        {
+            return false;
+        }
+    }
 }
 
 /// <summary>
@@ -142,4 +163,12 @@ public class GetLocationsOf
 {
     public static readonly string? App =
         Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+}
+
+public class GetConnectionString
+{
+    public static string? UsersDb(string databaseFilePath)
+    {
+        return $"Data Source={databaseFilePath}";
+    }
 }

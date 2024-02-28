@@ -1,9 +1,10 @@
 using System.Net.WebSockets;
 using System.Reactive.Linq;
+using iGotify_Notification_Assist.Models;
 using Newtonsoft.Json;
 using Websocket.Client;
 
-namespace iGotify_Notification_Assist;
+namespace iGotify_Notification_Assist.Services;
 
 public class WebSockClient
 {
@@ -11,7 +12,7 @@ public class WebSockClient
 
     private WebsocketClient? ws = null;
 
-    public void Start()
+    public void Start(string clientToken)
     {
         int connectionCount = 1;
         if (URL != null && URL.Length == 0)
@@ -19,7 +20,7 @@ public class WebSockClient
 
         // Init WebSocket 
         ws = new WebsocketClient(new Uri(URL!));
-        ws.Name = "iGotify-Assistent";
+        ws.Name = clientToken;
         ws.IsReconnectionEnabled = false;
         /*ws.ReconnectTimeout = TimeSpan.FromMinutes(30);
         ws.ReconnectionHappened.Subscribe(info =>
@@ -44,8 +45,9 @@ public class WebSockClient
             if (type.Type == DisconnectionType.Lost)
             {
                 Console.WriteLine($"Connection lost reconnect to Websocket...");
+                string wsName = ws.Name;
                 Stop();
-                Start();
+                Start(wsName);
             }
         });
         
@@ -67,11 +69,13 @@ public class WebSockClient
                 }
                 
                 // Go and send the message 
-                await new DeviceModel().SendNotifications(gm);
+                Console.WriteLine($"WS Instance from: {ws.Name}");
+                await new DeviceModel().SendNotifications(gm, ws.Name);
             }))
             .Concat() // executes sequentially
             .Subscribe();
         ws.Start();
+        Console.WriteLine("Done!");
     }
 
     /// <summary>

@@ -1,4 +1,6 @@
-namespace iGotify_Notification_Assist;
+using iGotify_Notification_Assist.Services;
+
+namespace iGotify_Notification_Assist.Services;
 
 public class StartUpBuilder : IStartupFilter
 {

@@ -1,4 +1,4 @@
-namespace iGotify_Notification_Assist;
+namespace iGotify_Notification_Assist.Models;
 
 public class ServerVersion
 {

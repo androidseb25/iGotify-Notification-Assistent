@@ -59,7 +59,7 @@ jobs:
           gotify_app_token: ${{ secrets.API_TOKEN }}
           notification_title: '[DOCKER] iGotify Notification Assist'
           notification_message: 'Build failed. DEV-Build: ${{ steps.extract_branch.outputs.branch }}'
-          notification_priority: 10
+          notification_priority: 9
       - name: Gotify Notification CANCELLED
         if: cancelled()
         uses: eikendev/gotify-action@master
