@@ -6,9 +6,9 @@ public class DeviceModel
 {
     public DeviceModel() { }
 
-    public string ClientToken { get; set; }
-    public string DeviceToken { get; set; }
-    public string GotifyUrl { get; set; }
+    public string ClientToken { get; set; } = "";
+    public string DeviceToken { get; set; } = "";
+    public string GotifyUrl { get; set; } = "";
 
     /// <summary>
     /// Add device token to txt file

@@ -45,8 +45,9 @@ public class WebSockClient
             if (type.Type == DisconnectionType.Lost)
             {
                 Console.WriteLine($"Connection lost reconnect to Websocket...");
+                string wsName = ws.Name;
                 Stop();
-                Start(ws.Name);
+                Start(wsName);
             }
         });
         

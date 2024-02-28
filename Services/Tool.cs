@@ -142,7 +142,7 @@ public class Tool
         url = url.Replace("api.", "").Replace("/api", "");
         
         var myRequest = new HttpRequestMessage(HttpMethod.Get, url);
-        
+        await Task.Run(() => { });
         try
         {
             var response = client.SendAsync(myRequest).GetAwaiter().GetResult();

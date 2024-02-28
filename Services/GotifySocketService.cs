@@ -21,7 +21,7 @@ public class GotifySocketService
         return _instance;
     }
     
-    public async void Init()
+    public void Init()
     {
         string path = $"{GetLocationsOf.App}/data";
         //Create Database File
@@ -32,7 +32,7 @@ public class GotifySocketService
 
     public void KillWsThread(string clientToken)
     {
-        WebSockClient wsc = new WebSockClient();
+        WebSockClient? wsc = new WebSockClient();
         WebsocketThreads.TryGetValue(clientToken, out wsc);
 
         if (wsc != null)
