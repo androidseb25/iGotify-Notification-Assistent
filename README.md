@@ -15,6 +15,7 @@ Download Link to iGotify down below
 * show received notifications with markdown
 * decrypted the message with a public key that is generated from the iGotify device
 * sending the decrypted message to SecNtfy and forwarded it to Apple's APN service, without saving the payload
+* multiuser support
 
 &nbsp;
 ## 🔧 How to Install Gotify & iGotify-Notification-Assist
