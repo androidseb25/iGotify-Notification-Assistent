@@ -149,6 +149,12 @@ jobs:
       - name: dotNet Publish
         run: dotnet publish "./iGotify Notification Assist.csproj" -c Release --runtime ${{ matrix.target }} -o "./${{ matrix.release_name }}/publish"
 
+#      - name: Upload coverage reports to Codecov
+#        uses: codecov/codecov-action@v4.0.1
+#        with:
+#          token: ${{ secrets.CODECOV_TOKEN }}
+#          slug: androidseb25/iGotify-Notification-Assistent
+
       - name: Upload Binaries ${{ matrix.target }}
         uses: actions/upload-artifact@v4
         with:
