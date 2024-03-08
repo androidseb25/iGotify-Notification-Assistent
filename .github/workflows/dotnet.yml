@@ -1,16 +1,14 @@
 name: Build and Release dotNet
 
-on: [push]
-#on:
-#  pull_request:
-#    types:
-#      - closed
-#    paths-ignore:
-#      - '*.md'
-#      - '.github/**'
-#      - '*.yaml'
-#      - '*.png'
-#      - 'LICENSE'
+#on: [push]
+on:
+  push:
+    paths-ignore:
+      - '*.md'
+      - '.github/**'
+      - '*.yaml'
+      - '*.png'
+      - 'LICENSE'
 
 jobs:
   release-project:
