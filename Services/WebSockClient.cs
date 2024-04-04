@@ -22,21 +22,7 @@ public class WebSockClient
         ws = new WebsocketClient(new Uri(URL!));
         ws.Name = clientToken;
         ws.IsReconnectionEnabled = false;
-        /*ws.ReconnectTimeout = TimeSpan.FromMinutes(30);
-        ws.ReconnectionHappened.Subscribe(info =>
-        {
-            Console.WriteLine($"Reconnection happened, type: {info.Type}");
-            if (info.Type == ReconnectionType.NoMessageReceived) {
-                connectionCount += 1;
-                Console.WriteLine($"Active connection after reconnecting: {connectionCount}");
-                if (connectionCount != 1)
-                {
-                    Console.WriteLine($"Kill all connection and make it clean!");
-                    Stop();
-                    Start();
-                }
-            }
-        });*/
+        
         // When a disconnection happend try to reconnect the WebSocket
         ws.DisconnectionHappened.Subscribe(type =>
         {

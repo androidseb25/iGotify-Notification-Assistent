@@ -1,5 +1,6 @@
 using System.Net.WebSockets;
 using iGotify_Notification_Assist.Models;
+using SecNtfyNuGet;
 
 namespace iGotify_Notification_Assist.Services;
 
@@ -24,6 +25,10 @@ public class GotifySocketService
     public void Init()
     {
         string path = $"{GetLocationsOf.App}/data";
+
+        if (!Directory.Exists(path))
+            Directory.CreateDirectory(path);
+        
         //Create Database File
         bool isDbFileExists = DatabaseService.CreateDatebase(path);
         Console.WriteLine($"Database is created: {isDbFileExists}");
@@ -93,8 +98,8 @@ public class GotifySocketService
 
         foreach (Users user in userList)
         {
-            string isGotifyAvailable = await Tool.CheckIfUrlReachable(user.GotifyUrl) ? "yes" : "no";
-            string isSecNtfyAvailable = await Tool.CheckIfUrlReachable(secntfyUrl) ? "yes" : "no";
+            string isGotifyAvailable = SecNtfy.CheckIfUrlReachable(user.GotifyUrl) ? "yes" : "no";
+            string isSecNtfyAvailable = SecNtfy.CheckIfUrlReachable(secntfyUrl) ? "yes" : "no";
         
             Console.WriteLine($"Gotify - Url: {user.GotifyUrl}");
             Console.WriteLine($"Is Gotify - Url available: {isGotifyAvailable}");

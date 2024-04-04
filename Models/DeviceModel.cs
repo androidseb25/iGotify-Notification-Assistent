@@ -1,4 +1,5 @@
 using iGotify_Notification_Assist.Services;
+using SecNtfyNuGet;
 
 namespace iGotify_Notification_Assist.Models;
 
@@ -48,6 +49,7 @@ public class DeviceModel
             Console.WriteLine("THERE'S SOMETHING WRONG HERE? NO USER FOUND");
         }
         
-        _ = Tool.SendNotification(usr.DeviceToken, title, msg, iGotifyMessage.priority == 10, imageUrl, iGotifyMessage.priority);
+        SecNtfy ntfy = new SecNtfy(Environment.GetEnvironmentVariable("SECNTFY_SERVER_URL") ?? "https://api.secntfy.app/api");
+        _ = ntfy.SendNotification(usr.DeviceToken, title, msg, iGotifyMessage.priority == 10, imageUrl, iGotifyMessage.priority);
     }
 }
