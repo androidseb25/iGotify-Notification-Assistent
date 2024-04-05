@@ -98,7 +98,7 @@ public class DeviceController : ControllerBase
     [HttpGet("Test/{deviceToken}")]
     public async Task<IActionResult> Test(string deviceToken)
     {
-        SecNtfy ntfy = new SecNtfy(Environment.GetEnvironmentVariable("SECNTFY_SERVER_URL") ?? "https://api.secntfy.app/api");
+        SecNtfy ntfy = new SecNtfy(Environment.GetEnvironmentVariable("SECNTFY_SERVER_URL") ?? "https://api.secntfy.app");
         if (deviceToken.Length > 0)
             _ = await ntfy.SendNotification(deviceToken, "Test", "Test Nachricht", false, "", 0);
         Console.WriteLine(ntfy.encTitle);

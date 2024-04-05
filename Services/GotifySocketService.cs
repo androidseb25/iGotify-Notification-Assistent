@@ -92,7 +92,7 @@ public class GotifySocketService
     /// </summary>
     public async void Start()
     {
-        string? secntfyUrl = Environment.GetEnvironmentVariable("SECNTFY_SERVER_URL") ?? "https://api.secntfy.app/api";
+        string? secntfyUrl = Environment.GetEnvironmentVariable("SECNTFY_SERVER_URL") ?? "https://api.secntfy.app";
 
         List<Users> userList = await DatabaseService.GetUsers();
 

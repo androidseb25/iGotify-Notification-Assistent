@@ -12,6 +12,7 @@ on:
 
 jobs:
   build_arm64_images:
+    if: startsWith(github.ref, 'refs/tags/v')
     #if: github.event.pull_request.merged == true
     name: "Build Multi Arch Images"
     runs-on: ubuntu-latest

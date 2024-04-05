@@ -12,6 +12,7 @@ on:
 
 jobs:
   release-project:
+    if: startsWith(github.ref, 'refs/tags/v')
     name: Release application to GitHub
     strategy:
       matrix:
@@ -156,6 +157,7 @@ jobs:
 #          slug: androidseb25/iGotify-Notification-Assistent
 
       - name: Upload Binaries ${{ matrix.target }}
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}
