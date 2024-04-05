@@ -86,6 +86,7 @@ public class DeviceController : ControllerBase
                 gss.KillWsThread(usr.ClientToken);
             }
             result = "Gerät erfolgreich gelöscht";
+            
             resultBool = true;
         } else {
             result = "Fehler beim löschen des Gerätes!";
