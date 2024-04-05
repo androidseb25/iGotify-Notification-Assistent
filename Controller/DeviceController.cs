@@ -85,8 +85,8 @@ public class DeviceController : ControllerBase
                 GotifySocketService gss = GotifySocketService.getInstance();
                 gss.KillWsThread(usr.ClientToken);
             }
+
             result = "Gerät erfolgreich gelöscht";
-            
             resultBool = true;
         } else {
             result = "Fehler beim löschen des Gerätes!";

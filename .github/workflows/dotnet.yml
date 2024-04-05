@@ -39,6 +39,7 @@ jobs:
           name: ${{ matrix.target }}
           path: ${{ matrix.release_name }}
       - name: Archive binaries
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: thedoctor0/zip-release@master
         with:
           filename: ${{ matrix.release_name }}.zip
@@ -68,6 +69,7 @@ jobs:
           tag_name: ${{ steps.infos.outputs.version }}
           release_name: Release ${{ steps.infos.outputs.version }}
       - name: Get Release URL
+        if: startsWith(github.ref, 'refs/tags/v')
         id: get-release-url
         uses: jossef/action-latest-release-info@v1.2.1
         env:
@@ -157,7 +159,6 @@ jobs:
 #          slug: androidseb25/iGotify-Notification-Assistent
 
       - name: Upload Binaries ${{ matrix.target }}
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}
