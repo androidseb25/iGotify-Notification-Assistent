@@ -12,9 +12,8 @@ public class WebSockClient
 
     private WebsocketClient? ws = null;
 
-    public void Start(string clientToken)
+    public void Start(string clientToken, bool isRestart = false)
     {
-        int connectionCount = 1;
         if (URL != null && URL.Length == 0)
             throw new ApplicationException("URL is empty!");
 
@@ -22,18 +21,30 @@ public class WebSockClient
         ws = new WebsocketClient(new Uri(URL!));
         ws.Name = clientToken;
         ws.IsReconnectionEnabled = false;
+
+        ws.ReconnectionHappened.Subscribe(info =>
+        {
+            //Console.WriteLine($"ReconnectionHappened {info.Type}");
+            if (info.Type == ReconnectionType.Initial && isRestart)
+            {
+                Console.WriteLine($"Gotify with Clienttoken: \"{clientToken}\" is successfully reconnected!");
+            }
+        });
         
         // When a disconnection happend try to reconnect the WebSocket
         ws.DisconnectionHappened.Subscribe(type =>
         {
-            connectionCount -= 1;
-            Console.WriteLine($"Disconnection happened, type: {type}");
+            string wsName = ws.Name;
+            Console.WriteLine($"Disconnection happened, type: {type.Type}");
             if (type.Type == DisconnectionType.Lost)
             {
                 Console.WriteLine($"Connection lost reconnect to Websocket...");
-                string wsName = ws.Name;
                 Stop();
-                Start(wsName);
+                Start(wsName, true);
+            } else if (type.Type == DisconnectionType.Error)
+            {
+                Console.WriteLine($"Webseocket Reconnection failed with Error. Try to reconnect in 10s.");
+                ReconnectDelayed(wsName);
             }
         });
         
@@ -61,7 +72,8 @@ public class WebSockClient
             .Concat() // executes sequentially
             .Subscribe();
         ws.Start();
-        Console.WriteLine("Done!");
+        if (!isRestart)
+            Console.WriteLine("Done!");
     }
 
     /// <summary>
@@ -72,5 +84,12 @@ public class WebSockClient
         await ws!.Stop(WebSocketCloseStatus.Empty, "Connection closing.");
         ws = null;
         await Task.Delay(1000);
+    }
+
+    public async void ReconnectDelayed(string clientToken)
+    {
+        ws = null;
+        await Task.Delay(10000);
+        Start(clientToken, true);
     }
 }

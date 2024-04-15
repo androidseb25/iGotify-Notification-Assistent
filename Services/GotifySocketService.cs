@@ -96,11 +96,33 @@ public class GotifySocketService
 
         List<Users> userList = await DatabaseService.GetUsers();
 
+        StartConnection(userList, secntfyUrl);
+    }
+
+    private void StartConnection(List<Users> userList, string secntfyUrl)
+    {
         foreach (Users user in userList)
         {
-            string isGotifyAvailable = SecNtfy.CheckIfUrlReachable(user.GotifyUrl) ? "yes" : "no";
-            string isSecNtfyAvailable = SecNtfy.CheckIfUrlReachable(secntfyUrl) ? "yes" : "no";
-        
+            string isGotifyAvailable = "";
+            string isSecNtfyAvailable = "";
+            try
+            {
+                isGotifyAvailable = SecNtfy.CheckIfUrlReachable(user.GotifyUrl) ? "yes" : "no";
+
+                if (isGotifyAvailable == "no")
+                {
+                    StartConnection(userList, secntfyUrl);
+                    return;
+                }
+
+                isSecNtfyAvailable = SecNtfy.CheckIfUrlReachable(secntfyUrl) ? "yes" : "no";
+            }
+            catch
+            {
+                StartDelayedConnection(userList, secntfyUrl);
+                return;
+            }
+
             Console.WriteLine($"Gotify - Url: {user.GotifyUrl}");
             Console.WriteLine($"Is Gotify - Url available: {isGotifyAvailable}");
             Console.WriteLine($"SecNtfy Server - Url: {secntfyUrl}");
@@ -109,5 +131,13 @@ public class GotifySocketService
             
             StartWSThread(user.GotifyUrl, user.ClientToken);
         }
+    }
+
+    private async void StartDelayedConnection(List<Users> userList, string secntfyUrl)
+    {
+        Console.WriteLine("Gotify Server is not available try to reconnect in 10s.");
+        await Task.Delay(10000);
+        Console.WriteLine("Reconnecting...");
+        StartConnection(userList, secntfyUrl);
     }
 }
