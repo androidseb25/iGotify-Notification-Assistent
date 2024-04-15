@@ -12,13 +12,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Dapper" Version="2.1.37" />
+        <PackageReference Include="Dapper" Version="2.1.44" />
         <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
         <PackageReference Include="Dapper.Mapper" Version="2.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.3" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.3" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.4" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.4" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="secntfy.nuget" Version="1.0.3" />
+        <PackageReference Include="secntfy.nuget" Version="1.0.4" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="Websocket.Client" Version="5.1.1" />
     </ItemGroup>
