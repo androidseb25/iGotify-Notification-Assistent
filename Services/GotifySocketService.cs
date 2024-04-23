@@ -11,7 +11,7 @@ public class GotifySocketService
     private static GotifySocketService? _instance;
 
     // Datenstruktur zur Verfolgung von Threads und WebSocket-Verbindungen
-    private static Dictionary<string, WebSockClient>? WebsocketThreads = null;
+    private static Dictionary<string, WebSockClient>? _websocketThreads = null;
 
     public static GotifySocketService getInstance()
     {
@@ -33,12 +33,12 @@ public class GotifySocketService
 
     public static void KillWsThread(string clientToken)
     {
-        if (WebsocketThreads != null)
+        if (_websocketThreads != null)
         {
-            WebsocketThreads.TryGetValue(clientToken, out var wsc);
+            _websocketThreads.TryGetValue(clientToken, out var wsc);
             if (wsc == null) return;
             wsc.Stop();
-            WebsocketThreads.Remove(clientToken);
+            _websocketThreads.Remove(clientToken);
         }
     }
 
@@ -68,10 +68,10 @@ public class GotifySocketService
                 // Connect the client
 
                 // Fügen Sie den Thread und die zugehörige WebSocket-Verbindung zur Datenstruktur hinzu
-                if (WebsocketThreads == null)
-                    WebsocketThreads = new Dictionary<string, WebSockClient>();
+                if (_websocketThreads == null)
+                    _websocketThreads = new Dictionary<string, WebSockClient>();
                 
-                WebsocketThreads.Add(clientToken, wsc);
+                _websocketThreads.Add(clientToken, wsc);
                 
                 Thread.Sleep(Timeout.Infinite);
             }
