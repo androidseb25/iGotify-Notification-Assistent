@@ -1,0 +1,31 @@
+version: "1.0"
+linter: jetbrains/qodana-dotnet:2023.3
+include:
+  - name: AutoPropertyCanBeMadeGetOnly.Global
+  - name: AutoPropertyCanBeMadeGetOnly.Local
+  - name: ConvertToConstant.Local
+  - name: FieldCanBeMadeReadOnly.Global
+  - name: MemberCanBePrivate.Global
+  - name: MemberCanBeMadeStatic.Global
+  - name: MemberCanBeMadeStatic.Local
+  - name: PropertyCanBeMadeInitOnly.Global
+  - name: ConvertIfStatementToNullCoalescingExpression
+  - name: ConvertIfStatementToSwitchStatement
+  - name: ConvertToPrimaryConstructor
+  - name: ConvertToUsingDeclaration
+  - name: InvertIf
+  - name: MergeIntoPattern
+  - name: UseCollectionExpression
+  - name: UseObjectOrCollectionInitializer
+  - name: ClassNeverInstantiated.Global
+  - name: RedundantStringInterpolation
+  - name: UnusedType.Global
+  - name: UnusedMember.Global
+  - name: CA1822
+  - name: CA2211
+  - name: CA1859
+  - name: ArrangeThisQualifier
+  - name: SuggestVarOrType_Elsewhere
+  - name: SuggestVarOrType_BuiltInTypes
+  - name: SuggestVarOrType_SimpleTypes
+  - name: ArrangeObjectCreationWhenTypeEvident
