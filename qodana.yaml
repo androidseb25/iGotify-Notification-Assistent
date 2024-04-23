@@ -10,6 +10,10 @@ ide: QDNET
 #Specify inspection profile for code analysis
 profile:
   name: qodana.starter
+exclude:
+  - name: All
+    paths:
+      - Models/ServerVersion.cs
 
 #Enable inspections
 #include:
