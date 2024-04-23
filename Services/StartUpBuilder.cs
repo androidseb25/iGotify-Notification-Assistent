@@ -1,5 +1,3 @@
-using iGotify_Notification_Assist.Services;
-
 namespace iGotify_Notification_Assist.Services;
 
 public class StartUpBuilder : IStartupFilter
@@ -10,7 +8,7 @@ public class StartUpBuilder : IStartupFilter
         {
             // Create GotifyInstance after starting of the API
             
-            GotifySocketService gss = GotifySocketService.getInstance();
+            var gss = GotifySocketService.getInstance();
             gss.Init();
             if (gss.isInit)
                 gss.Start();

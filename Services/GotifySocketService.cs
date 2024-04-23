@@ -6,61 +6,56 @@ namespace iGotify_Notification_Assist.Services;
 
 public class GotifySocketService
 {
-    public bool isInit { get; set; }
+    public bool isInit { get; private set; }
 
-    private static GotifySocketService? _instance = null;
+    private static GotifySocketService? _instance;
 
     // Datenstruktur zur Verfolgung von Threads und WebSocket-Verbindungen
-    private static readonly Dictionary<string, WebSockClient> WebsocketThreads = new Dictionary<string, WebSockClient>();
-
-    public GotifySocketService() { }
+    private static Dictionary<string, WebSockClient>? WebsocketThreads = null;
 
     public static GotifySocketService getInstance()
     {
-        if (_instance == null)
-            _instance = new GotifySocketService();
-        return _instance;
+        return _instance ??= new GotifySocketService();
     }
     
     public void Init()
     {
-        string path = $"{GetLocationsOf.App}/data";
+        var path = $"{GetLocationsOf.App}/data";
 
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
         
         //Create Database File
-        bool isDbFileExists = DatabaseService.CreateDatebase(path);
+        var isDbFileExists = DatabaseService.CreateDatebase(path);
         Console.WriteLine($"Database is created: {isDbFileExists}");
         isInit = isDbFileExists;
     }
 
-    public void KillWsThread(string clientToken)
+    public static void KillWsThread(string clientToken)
     {
-        WebSockClient? wsc = new WebSockClient();
-        WebsocketThreads.TryGetValue(clientToken, out wsc);
-
-        if (wsc != null)
+        if (WebsocketThreads != null)
         {
+            WebsocketThreads.TryGetValue(clientToken, out var wsc);
+            if (wsc == null) return;
             wsc.Stop();
             WebsocketThreads.Remove(clientToken);
         }
     }
 
-    public void StartWSThread(string gotifyServerUrl, string clientToken)
+    public static void StartWsThread(string gotifyServerUrl, string clientToken)
     {
-        Thread thread = new Thread(() => StartWSConn(gotifyServerUrl, clientToken));
+        var thread = new Thread(() => StartWsConn(gotifyServerUrl, clientToken));
         thread.Start();
     }
 
-    private void StartWSConn(string gotifyServerUrl, string clientToken)
+    private static void StartWsConn(string gotifyServerUrl, string clientToken)
     {
         while (true)
         {
             try
             {
-                string? wsUrl = "";
-                string? socket = "";
+                string wsUrl;
+                string socket;
                 
                 socket = gotifyServerUrl.Contains("http://") ? "ws" : "wss";
                 gotifyServerUrl = gotifyServerUrl.Replace("http://", "").Replace("https://", "").Replace("\"", "");
@@ -68,12 +63,14 @@ public class GotifySocketService
                 
                 // Starting WebSocket instance
                 Console.WriteLine("Client connecting...");
-                WebSockClient wsc = new WebSockClient();
-                wsc.URL = wsUrl;
+                var wsc = new WebSockClient { URL = wsUrl };
                 wsc.Start(clientToken);
                 // Connect the client
 
                 // Fügen Sie den Thread und die zugehörige WebSocket-Verbindung zur Datenstruktur hinzu
+                if (WebsocketThreads == null)
+                    WebsocketThreads = new Dictionary<string, WebSockClient>();
+                
                 WebsocketThreads.Add(clientToken, wsc);
                 
                 Thread.Sleep(Timeout.Infinite);
@@ -92,19 +89,19 @@ public class GotifySocketService
     /// </summary>
     public async void Start()
     {
-        string? secntfyUrl = Environment.GetEnvironmentVariable("SECNTFY_SERVER_URL") ?? "https://api.secntfy.app";
+        var secntfyUrl = Environment.GetEnvironmentVariable("SECNTFY_SERVER_URL") ?? "https://api.secntfy.app";
 
-        List<Users> userList = await DatabaseService.GetUsers();
+        var userList = await DatabaseService.GetUsers();
 
         StartConnection(userList, secntfyUrl);
     }
 
     private void StartConnection(List<Users> userList, string secntfyUrl)
     {
-        foreach (Users user in userList)
+        foreach (var user in userList)
         {
-            string isGotifyAvailable = "";
-            string isSecNtfyAvailable = "";
+            string isGotifyAvailable;
+            string isSecNtfyAvailable;
             try
             {
                 isGotifyAvailable = SecNtfy.CheckIfUrlReachable(user.GotifyUrl) ? "yes" : "no";
@@ -129,7 +126,7 @@ public class GotifySocketService
             Console.WriteLine($"Is SecNtfy Server - Url available: {isSecNtfyAvailable}");
             Console.WriteLine($"Client - Token: {user.ClientToken}");
             
-            StartWSThread(user.GotifyUrl, user.ClientToken);
+            StartWsThread(user.GotifyUrl, user.ClientToken);
         }
     }
 
