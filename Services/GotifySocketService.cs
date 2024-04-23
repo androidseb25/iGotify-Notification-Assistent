@@ -11,7 +11,7 @@ public class GotifySocketService
     private static GotifySocketService? _instance;
 
     // Datenstruktur zur Verfolgung von Threads und WebSocket-Verbindungen
-    private static Dictionary<string, WebSockClient>? _websocketThreads = null;
+    private static Dictionary<string, WebSockClient>? _websocketThreads;
 
     public static GotifySocketService getInstance()
     {
