@@ -21,13 +21,13 @@ public class DeviceController : ControllerBase
         bool resultBool;
         
         Console.WriteLine($"ClientToken: {deviceModel.ClientToken}");
-        Console.WriteLine($"DeviceToken: {DeviceModel.DeviceToken}");
-        Console.WriteLine($"GotifyUrl: {DeviceModel.GotifyUrl}");
+        Console.WriteLine($"DeviceToken: {deviceModel.DeviceToken}");
+        Console.WriteLine($"GotifyUrl: {deviceModel.GotifyUrl}");
 
         if (
             deviceModel.ClientToken.Length == 0 || deviceModel.ClientToken == "string" ||
-            DeviceModel.DeviceToken.Length == 0 || DeviceModel.DeviceToken.Length < 60 || DeviceModel.DeviceToken == "string" ||
-            DeviceModel.GotifyUrl.Length == 0 || DeviceModel.GotifyUrl == "string"
+            deviceModel.DeviceToken.Length == 0 || deviceModel.DeviceToken.Length < 60 || deviceModel.DeviceToken == "string" ||
+            deviceModel.GotifyUrl.Length == 0 || deviceModel.GotifyUrl == "string"
             )
         {
             result = "Fehler beim hinzugefügen des Gerätes!";
@@ -38,7 +38,7 @@ public class DeviceController : ControllerBase
         if (await deviceModel.Insert())
         {
             GotifySocketService.getInstance();
-            GotifySocketService.StartWsThread(DeviceModel.GotifyUrl, deviceModel.ClientToken);
+            GotifySocketService.StartWsThread(deviceModel.GotifyUrl, deviceModel.ClientToken);
             result = "Gerät erfolgreich hinzugefügt";
             resultBool = true;
         } else {

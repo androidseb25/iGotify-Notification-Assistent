@@ -5,9 +5,9 @@ namespace iGotify_Notification_Assist.Models;
 
 public class DeviceModel
 {
-    public string ClientToken { get; init; } = "";
-    public static string DeviceToken => "";
-    public static string GotifyUrl => "";
+    public string ClientToken { get; set; }
+    public string DeviceToken { get; set; }
+    public string GotifyUrl { get; set; }
 
     /// <summary>
     /// Add device token to txt file

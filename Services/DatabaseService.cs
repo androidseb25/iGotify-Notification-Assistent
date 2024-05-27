@@ -95,7 +95,7 @@ public static class DatabaseService
         dbConnection.Open();
 
         // Create a sample table
-        var insertQuery = $"insert into Users (ClientToken, DeviceToken, GotifyUrl) values ('{dm.ClientToken}', '{DeviceModel.DeviceToken}', '{DeviceModel.GotifyUrl}');";
+        var insertQuery = $"insert into Users (ClientToken, DeviceToken, GotifyUrl) values ('{dm.ClientToken}', '{dm.DeviceToken}', '{dm.GotifyUrl}');";
         var id = await dbConnection.ExecuteAsync(insertQuery);
 
         inserted = id > 0;
