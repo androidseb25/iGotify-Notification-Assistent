@@ -37,6 +37,20 @@ Download Link to iGotify down below
 
 * `GOTIFY_DEFAULTUSER_PASS` = the user password for the defaultuser
 
+### oOptional environment variables
+
+* `GOTIFY_URLS` = the local gotify sever URL e.g.: `http://gotify`
+* `GOTIFY_CLIENT_TOKENS` = the client token from the Gotify Client e.g.: `cXXXXXXXX`
+* `SECNTFY_TOKENS` = the SecNtfy Token that you get from the app after configure it e.g.: `NTFY-DEVICE-XXXXXX`
+
+#### All these configuration can be found after configure the app. It will display it for you
+#### Please note you can configure multiple instances of local gotify server by adding a semicolon `;` after each environment value e.g.:
+
+* `GOTIFY_URLS: 'http://gotify;http://gotify2;http://gotify3;...'`
+* `GOTIFY_CLIENT_TOKENS: 'cXXXXXXXX1;cXXXXXXXX2;cXXXXXXXX3;...'`
+* `SECNTFY_TOKENS: 'NTFY-DEVICE-XXXXXX1;NTFY-DEVICE-XXXXXX2;NTFY-DEVICE-XXXXXX3;...'`
+
+&nbsp;
 
 ```bash
 version: '3.8'
@@ -75,6 +89,10 @@ services:
       - "8681:8080"
     volumes:
       - api-data:/app/data
+    #environment:                 # option environment see above note
+    #  GOTIFY_URLS:          ''
+    #  GOTIFY_CLIENT_TOKENS: ''
+    #  SECNTFY_TOKENS:       ''
 
 networks:
   net:
@@ -151,6 +169,12 @@ services:
     pull_policy: always
     volumes:
       - api-data:/app/data
+      
+    #environment:                 # option environment see above note
+    #  GOTIFY_URLS:          ''
+    #  GOTIFY_CLIENT_TOKENS: ''
+    #  SECNTFY_TOKENS:       ''
+    
     labels:
       traefik.docker.network: proxy
       traefik.enable: "true"
