@@ -77,7 +77,7 @@ public class WebSockClient
                 
                 // Go and send the message 
                 Console.WriteLine($"WS Instance from: {ws.Name}");
-                await new DeviceModel().SendNotifications(gm, ws.Name);
+                await new DeviceModel().SendNotifications(gm, ws);
             }))
             .Concat() // executes sequentially
             .Subscribe();

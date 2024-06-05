@@ -1,5 +1,6 @@
 using iGotify_Notification_Assist.Services;
 using SecNtfyNuGet;
+using Websocket.Client;
 
 namespace iGotify_Notification_Assist.Models;
 
@@ -34,14 +35,14 @@ public class DeviceModel
     /// </summary>
     /// <param name="iGotifyMessage"></param>
     /// <param name="clientToken"></param>
-    public async Task SendNotifications(GotifyMessage iGotifyMessage, string clientToken)
+    public async Task SendNotifications(GotifyMessage iGotifyMessage, WebsocketClient webSock)
     {
         var title = iGotifyMessage.title;
         var msg = iGotifyMessage.message;
-        const string imageUrl = "";
+        var imageUrl = $"{webSock.Url.ToString()}$$${iGotifyMessage.appid}$$${webSock.Name}";
 
 
-        var usr = await DatabaseService.GetUser(clientToken);
+        var usr = await DatabaseService.GetUser(webSock.Name!);
 
         if (usr.Uid == 0)
         {
