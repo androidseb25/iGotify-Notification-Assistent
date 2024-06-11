@@ -40,8 +40,7 @@ public class DeviceModel
         var title = iGotifyMessage.title;
         var msg = iGotifyMessage.message;
         var imageUrl = $"{webSock.Url.ToString()}$$${iGotifyMessage.appid}$$${webSock.Name}";
-
-
+        
         var usr = await DatabaseService.GetUser(webSock.Name!);
 
         if (usr.Uid == 0)
