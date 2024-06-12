@@ -39,7 +39,10 @@ public class DeviceModel
     {
         var title = iGotifyMessage.title;
         var msg = iGotifyMessage.message;
-        var imageUrl = $"{webSock.Url.ToString()}$$${iGotifyMessage.appid}$$${webSock.Name}";
+        
+        var protocol = webSock.Url.ToString().Contains("ws://") ? "http://" : "https://";
+        var gotifyServerUrl = webSock.Url.ToString().Replace("ws://", "").Replace("wss://", "").Replace("\"", "").Split("/stream");
+        var imageUrl = gotifyServerUrl.Length > 0 ? $"{protocol}{gotifyServerUrl[0]}$$${iGotifyMessage.appid}$$${webSock.Name}" : "";
         
         var usr = await DatabaseService.GetUser(webSock.Name!);
 
