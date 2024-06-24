@@ -20,7 +20,7 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="secntfy.nuget" Version="1.0.5" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-        <PackageReference Include="Websocket.Client" Version="5.1.1" />
+        <PackageReference Include="Websocket.Client" Version="5.1.2" />
     </ItemGroup>
 
 </Project>
