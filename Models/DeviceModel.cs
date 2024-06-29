@@ -18,7 +18,8 @@ public class DeviceModel
     {
         if (!await DatabaseService.CheckIfUserExists(this))
             return await DatabaseService.InsertUser(this);
-        return true;
+        else
+            return false;
     }
 
     /// <summary>
