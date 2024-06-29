@@ -44,7 +44,7 @@ public static class DatabaseService
 
         // Create a sample table
         var selectQuery = $"select count(*) from Users u where u.ClientToken = '{dm.ClientToken}';";
-        var id = await dbConnection.ExecuteScalarAsync<dynamic>(selectQuery);
+        var id = await dbConnection.ExecuteScalarAsync<int>(selectQuery);
 
         isExists = id > 0;
                 
