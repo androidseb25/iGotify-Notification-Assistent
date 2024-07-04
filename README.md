@@ -72,7 +72,6 @@ services:
     volumes:
       - data:/app/data
     environment:
-      TZ:                       'Europe/Berlin'
       GOTIFY_DEFAULTUSER_PASS:  'my-very-strong-password'   # Change me!!!!!
 
   igotify:
@@ -138,7 +137,6 @@ services:
     volumes:
       - data:/app/data
     environment:
-      TZ:                       'Europe/Berlin'
       GOTIFY_DEFAULTUSER_PASS:  'my-very-strong-password'   # Change me!!!!!
       GOTIFY_REGISTRATION:       'false'
     labels:
