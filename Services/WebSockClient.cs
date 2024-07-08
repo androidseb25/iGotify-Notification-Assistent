@@ -8,13 +8,13 @@ namespace iGotify_Notification_Assist.Services;
 
 public class WebSockClient
 {
-    public string? URL { get; set; }
+    public string? URL { get; init; }
 
-    private WebsocketClient? ws = null;
+    private WebsocketClient? ws;
 
     public void Start(string clientToken, bool isRestart = false)
     {
-        if (URL != null && URL.Length == 0)
+        if (URL is { Length: 0 })
             throw new ApplicationException("URL is empty!");
 
         // Init WebSocket 
@@ -34,17 +34,27 @@ public class WebSockClient
         // When a disconnection happend try to reconnect the WebSocket
         ws.DisconnectionHappened.Subscribe(type =>
         {
-            string wsName = ws.Name;
+            var wsName = ws.Name;
             Console.WriteLine($"Disconnection happened, type: {type.Type}");
-            if (type.Type == DisconnectionType.Lost)
+            switch (type.Type)
             {
-                Console.WriteLine($"Connection lost reconnect to Websocket...");
-                Stop();
-                Start(wsName, true);
-            } else if (type.Type == DisconnectionType.Error)
-            {
-                Console.WriteLine($"Webseocket Reconnection failed with Error. Try to reconnect in 10s.");
-                ReconnectDelayed(wsName);
+                case DisconnectionType.Lost:
+                    Console.WriteLine("Connection lost reconnect to Websocket...");
+                    Stop();
+                    Start(wsName, true);
+                    break;
+                case DisconnectionType.Error:
+                    Console.WriteLine("Webseocket Reconnection failed with Error. Try to reconnect in 10s.");
+                    ReconnectDelayed(wsName);
+                    break;
+                case DisconnectionType.Exit:
+                    break;
+                case DisconnectionType.ByServer:
+                    break;
+                case DisconnectionType.NoMessageReceived:
+                    break;
+                case DisconnectionType.ByUser:
+                    break;
             }
         });
         
@@ -52,12 +62,12 @@ public class WebSockClient
         ws.MessageReceived.Select(msg => Observable.FromAsync(async () => {
                 //Console.WriteLine($"Message received: {msg}");
                 // Convert the payload from gotify and replace values because so we can cast it better cast it to an object
-                string message = msg.ToString().Replace("client::display", "clientdisplay")
+                var message = msg.ToString().Replace("client::display", "clientdisplay")
                     .Replace("client::notification", "clientnotification")
                     .Replace("android::action", "androidaction");
                 Console.WriteLine("Message converted: " + message);
-                var jsonData = JsonConvert.SerializeObject(message);
-                GotifyMessage? gm = JsonConvert.DeserializeObject<GotifyMessage>(message);
+                // var jsonData = JsonConvert.SerializeObject(message);
+                var gm = JsonConvert.DeserializeObject<GotifyMessage>(message);
                 // If object is null return and listen to the next message
                 if (gm == null)
                 {
@@ -67,7 +77,7 @@ public class WebSockClient
                 
                 // Go and send the message 
                 Console.WriteLine($"WS Instance from: {ws.Name}");
-                await new DeviceModel().SendNotifications(gm, ws.Name);
+                await new DeviceModel().SendNotifications(gm, ws);
             }))
             .Concat() // executes sequentially
             .Subscribe();
@@ -86,7 +96,7 @@ public class WebSockClient
         await Task.Delay(1000);
     }
 
-    public async void ReconnectDelayed(string clientToken)
+    private async void ReconnectDelayed(string clientToken)
     {
         ws = null;
         await Task.Delay(10000);

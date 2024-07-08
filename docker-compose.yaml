@@ -17,7 +17,6 @@ services:
     volumes:
       - data:/app/data
     environment:
-      TZ:                       'Europe/Berlin'
       GOTIFY_DEFAULTUSER_PASS:  'my-very-strong-password'   # Change me!!!!!
 
   igotify:
@@ -34,6 +33,10 @@ services:
       - "8681:8080"
     volumes:
       - api-data:/app/data
+    #environment:                 # option environment see above note
+    #  GOTIFY_URLS:          ''
+    #  GOTIFY_CLIENT_TOKENS: ''
+    #  SECNTFY_TOKENS:       ''
 
 networks:
   net:

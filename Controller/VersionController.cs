@@ -1,6 +1,4 @@
 using System.Reflection;
-using System.Security.Cryptography;
-using iGotify_Notification_Assist.Helpers;
 using iGotify_Notification_Assist.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,13 +8,6 @@ namespace iGotify_Notification_Assist.Controller;
 [Route("[controller]")]
 public class VersionController : ControllerBase
 {
-    private readonly ILogger<DeviceController> _logger;
-    
-    public VersionController(ILogger<DeviceController> logger)
-    {
-        _logger = logger;
-    }
-    
     /// <summary>
     /// Get the current version of the container
     /// </summary>
@@ -24,9 +15,8 @@ public class VersionController : ControllerBase
     [HttpGet]
     public IActionResult GetVersion()
     {
-        ServerVersion sv = new ServerVersion();
-        sv.version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "";
-        DateTime buildDate = new FileInfo(Assembly.GetExecutingAssembly().Location).LastWriteTime;
+        var sv = new ServerVersion { version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "" };
+        var buildDate = new FileInfo(Assembly.GetExecutingAssembly().Location).LastWriteTime;
         sv.buildDate = buildDate.ToString("yyyy-MM-dd'T'HH:mm:ss");
         sv.commit = Programms.StartUpCommit;
         return Ok(sv);
@@ -35,5 +25,5 @@ public class VersionController : ControllerBase
 
 public static class Programms
 {
-    public static string? StartUpCommit = Guid.NewGuid().ToString().Replace("-", "");
+    public static readonly string? StartUpCommit = Guid.NewGuid().ToString().Replace("-", "");
 }

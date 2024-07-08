@@ -1,183 +1,159 @@
-using System.Data;
 using Dapper;
 using iGotify_Notification_Assist.Models;
 using Microsoft.Data.Sqlite;
 
 namespace iGotify_Notification_Assist.Services;
 
-public class DatabaseService
+public static class DatabaseService
 {
     public static bool CreateDatebase(string path)
     {
         //Create Database File
-        string pathToDb = Path.Combine(path, "users.db");
-        bool isDbFileExists = File.Exists(pathToDb);
+        var pathToDb = Path.Combine(path, "users.db");
+        var isDbFileExists = File.Exists(pathToDb);
 
-        if (!isDbFileExists)
-        {
-            string? connectionString = GetConnectionString.UsersDb(pathToDb);
-            using (IDbConnection dbConnection = new SqliteConnection(connectionString))
-            {
-                dbConnection.Open();
+        if (isDbFileExists) return true;
+        var connectionString = GetConnectionString.UsersDb(pathToDb);
+        using var dbConnection = new SqliteConnection(connectionString);
+        dbConnection.Open();
 
-                // Create a sample table
-                string createTableQuery = "create table if not exists Users (Uid integer primary key, ClientToken text not null, DeviceToken text not null, GotifyUrl text not null);";
-                dbConnection.Execute(createTableQuery);
+        // Create a sample table
+        const string createTableQuery = "create table if not exists Users (Uid integer primary key, ClientToken text not null, DeviceToken text not null, GotifyUrl text not null);";
+        dbConnection.Execute(createTableQuery);
 
-                // Perform other database operations as needed
+        // Perform other database operations as needed
 
-                // Close the connection when done
-                dbConnection.Close();
-            }
-        }
-        
+        // Close the connection when done
+        dbConnection.Close();
+
         return true;
+
     }
 
     public static async Task<bool> CheckIfUserExists(DeviceModel dm)
     {
-        string path = $"{GetLocationsOf.App}/data";
+        var path = $"{GetLocationsOf.App}/data";
         //Create Database File
-        string pathToDb = Path.Combine(path, "users.db");
-        bool isDbFileExists = File.Exists(pathToDb);
-        bool isExists = false;
-        
-        if (isDbFileExists)
-        {
-            using (IDbConnection dbConnection = new SqliteConnection(GetConnectionString.UsersDb(pathToDb)))
-            {
-                dbConnection.Open();
+        var pathToDb = Path.Combine(path, "users.db");
+        var isDbFileExists = File.Exists(pathToDb);
+        var isExists = false;
 
-                // Create a sample table
-                string selectQuery = $"select count(*) from Users u where u.ClientToken = '{dm.ClientToken}';";
-                var id = await dbConnection.ExecuteScalarAsync<dynamic>(selectQuery);
+        if (!isDbFileExists) return isExists;
+        await using var dbConnection = new SqliteConnection(GetConnectionString.UsersDb(pathToDb));
+        dbConnection.Open();
 
-                isExists = id > 0;
+        // Create a sample table
+        var selectQuery = $"select count(*) from Users u where u.ClientToken = '{dm.ClientToken}';";
+        var id = await dbConnection.ExecuteScalarAsync<int>(selectQuery);
+
+        isExists = id > 0;
                 
-                // Perform other database operations as needed
+        // Perform other database operations as needed
 
-                // Close the connection when done
-                dbConnection.Close();
-            }
-        }
-        
+        // Close the connection when done
+        dbConnection.Close();
+
         return isExists;
     }
 
     public static async Task<bool> DeleteUser(string clientToken)
     {
-        string path = $"{GetLocationsOf.App}/data";
+        var path = $"{GetLocationsOf.App}/data";
         //Create Database File
-        string pathToDb = Path.Combine(path, "users.db");
-        bool isDbFileExists = File.Exists(pathToDb);
-        bool isDeleted = false;
-        
-        if (isDbFileExists)
-        {
-            using (IDbConnection dbConnection = new SqliteConnection(GetConnectionString.UsersDb(pathToDb)))
-            {
-                dbConnection.Open();
+        var pathToDb = Path.Combine(path, "users.db");
+        var isDbFileExists = File.Exists(pathToDb);
+        var isDeleted = false;
 
-                // Create a sample table
-                string deleteQuery = $"delete from Users where ClientToken = '{clientToken}';";
-                var rows = await dbConnection.ExecuteAsync(deleteQuery);
+        if (!isDbFileExists) return isDeleted;
+        await using var dbConnection = new SqliteConnection(GetConnectionString.UsersDb(pathToDb));
+        dbConnection.Open();
 
-                isDeleted = rows > 0;
+        // Create a sample table
+        var deleteQuery = $"delete from Users where ClientToken = '{clientToken}';";
+        var rows = await dbConnection.ExecuteAsync(deleteQuery);
+
+        isDeleted = rows > 0;
                 
-                // Perform other database operations as needed
+        // Perform other database operations as needed
 
-                // Close the connection when done
-                dbConnection.Close();
-            }
-        }
-        
+        // Close the connection when done
+        dbConnection.Close();
+
         return isDeleted;
     }
 
     public static async Task<bool> InsertUser(DeviceModel dm)
     {
-        string path = $"{GetLocationsOf.App}/data";
+        var path = $"{GetLocationsOf.App}/data";
         //Create Database File
-        string pathToDb = Path.Combine(path, "users.db");
-        bool isDbFileExists = File.Exists(pathToDb);
-        bool inserted = false;
-        
-        if (isDbFileExists)
-        {
-            using (IDbConnection dbConnection = new SqliteConnection(GetConnectionString.UsersDb(pathToDb)))
-            {
-                dbConnection.Open();
+        var pathToDb = Path.Combine(path, "users.db");
+        var isDbFileExists = File.Exists(pathToDb);
+        var inserted = false;
 
-                // Create a sample table
-                string insertQuery = $"insert into Users (ClientToken, DeviceToken, GotifyUrl) values ('{dm.ClientToken}', '{dm.DeviceToken}', '{dm.GotifyUrl}');";
-                var id = await dbConnection.ExecuteAsync(insertQuery);
+        if (!isDbFileExists) return inserted;
+        await using var dbConnection = new SqliteConnection(GetConnectionString.UsersDb(pathToDb));
+        dbConnection.Open();
 
-                inserted = id > 0;
+        // Create a sample table
+        var insertQuery = $"insert into Users (ClientToken, DeviceToken, GotifyUrl) values ('{dm.ClientToken}', '{dm.DeviceToken}', '{dm.GotifyUrl}');";
+        var id = await dbConnection.ExecuteAsync(insertQuery);
+
+        inserted = id > 0;
                 
-                // Perform other database operations as needed
+        // Perform other database operations as needed
 
-                // Close the connection when done
-                dbConnection.Close();
-            }
-        }
-        
+        // Close the connection when done
+        dbConnection.Close();
+
         return inserted;
     }
 
     public static async Task<Users> GetUser(string clientToken)
     {
-        Users usr = new Users();
-        string path = $"{GetLocationsOf.App}/data";
+        var usr = new Users();
+        var path = $"{GetLocationsOf.App}/data";
         //Create Database File
-        string pathToDb = Path.Combine(path, "users.db");
-        bool isDbFileExists = File.Exists(pathToDb);
-        
-        if (isDbFileExists)
-        {
-            using (IDbConnection dbConnection = new SqliteConnection(GetConnectionString.UsersDb(pathToDb)))
-            {
-                dbConnection.Open();
+        var pathToDb = Path.Combine(path, "users.db");
+        var isDbFileExists = File.Exists(pathToDb);
 
-                // Create a sample table
-                string selectUserQuery = $"SELECT * FROM Users u where u.ClientToken = '{clientToken}';";
-                if (clientToken.Contains("NTFY-DEVICE-"))
-                    selectUserQuery = $"SELECT * FROM Users u where u.DeviceToken = '{clientToken}';";
-                usr = (await dbConnection.QueryAsync<Users>(selectUserQuery)).ToList().FirstOrDefault() ?? usr;
+        if (!isDbFileExists) return usr;
+        await using var dbConnection = new SqliteConnection(GetConnectionString.UsersDb(pathToDb));
+        dbConnection.Open();
 
-                // Perform other database operations as needed
+        // Create a sample table
+        var selectUserQuery = $"SELECT * FROM Users u where u.ClientToken = '{clientToken}';";
+        if (clientToken.Contains("NTFY-DEVICE-"))
+            selectUserQuery = $"SELECT * FROM Users u where u.DeviceToken = '{clientToken}';";
+        usr = (await dbConnection.QueryAsync<Users>(selectUserQuery)).ToList().FirstOrDefault() ?? usr;
 
-                // Close the connection when done
-                dbConnection.Close();
-            }
-        }
+        // Perform other database operations as needed
+
+        // Close the connection when done
+        dbConnection.Close();
 
         return usr;
     }
 
     public static async Task<List<Users>> GetUsers()
     {
-        List<Users> userList = new List<Users>();
-        string path = $"{GetLocationsOf.App}/data";
+        var userList = new List<Users>();
+        var path = $"{GetLocationsOf.App}/data";
         //Create Database File
-        string pathToDb = Path.Combine(path, "users.db");
-        bool isDbFileExists = File.Exists(pathToDb);
-        
-        if (isDbFileExists)
-        {
-            using (IDbConnection dbConnection = new SqliteConnection(GetConnectionString.UsersDb(pathToDb)))
-            {
-                dbConnection.Open();
+        var pathToDb = Path.Combine(path, "users.db");
+        var isDbFileExists = File.Exists(pathToDb);
 
-                // Create a sample table
-                string selectAllQuery = "SELECT * FROM Users u;";
-                userList = (await dbConnection.QueryAsync<Users>(selectAllQuery)).ToList();
+        if (!isDbFileExists) return userList;
+        await using var dbConnection = new SqliteConnection(GetConnectionString.UsersDb(pathToDb));
+        dbConnection.Open();
 
-                // Perform other database operations as needed
+        // Create a sample table
+        const string selectAllQuery = "SELECT * FROM Users u;";
+        userList = (await dbConnection.QueryAsync<Users>(selectAllQuery)).ToList();
 
-                // Close the connection when done
-                dbConnection.Close();
-            }
-        }
+        // Perform other database operations as needed
+
+        // Close the connection when done
+        dbConnection.Close();
 
         return userList;
     }

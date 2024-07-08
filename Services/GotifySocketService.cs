@@ -6,61 +6,56 @@ namespace iGotify_Notification_Assist.Services;
 
 public class GotifySocketService
 {
-    public bool isInit { get; set; }
+    public bool isInit { get; private set; }
 
-    private static GotifySocketService? _instance = null;
+    private static GotifySocketService? _instance;
 
     // Datenstruktur zur Verfolgung von Threads und WebSocket-Verbindungen
-    private static readonly Dictionary<string, WebSockClient> WebsocketThreads = new Dictionary<string, WebSockClient>();
-
-    public GotifySocketService() { }
+    private static Dictionary<string, WebSockClient>? _websocketThreads;
 
     public static GotifySocketService getInstance()
     {
-        if (_instance == null)
-            _instance = new GotifySocketService();
-        return _instance;
+        return _instance ??= new GotifySocketService();
     }
     
     public void Init()
     {
-        string path = $"{GetLocationsOf.App}/data";
+        var path = $"{GetLocationsOf.App}/data";
 
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
         
         //Create Database File
-        bool isDbFileExists = DatabaseService.CreateDatebase(path);
+        var isDbFileExists = DatabaseService.CreateDatebase(path);
         Console.WriteLine($"Database is created: {isDbFileExists}");
         isInit = isDbFileExists;
     }
 
-    public void KillWsThread(string clientToken)
+    public static void KillWsThread(string clientToken)
     {
-        WebSockClient? wsc = new WebSockClient();
-        WebsocketThreads.TryGetValue(clientToken, out wsc);
-
-        if (wsc != null)
+        if (_websocketThreads != null)
         {
+            _websocketThreads.TryGetValue(clientToken, out var wsc);
+            if (wsc == null) return;
             wsc.Stop();
-            WebsocketThreads.Remove(clientToken);
+            _websocketThreads.Remove(clientToken);
         }
     }
 
-    public void StartWSThread(string gotifyServerUrl, string clientToken)
+    public static void StartWsThread(string gotifyServerUrl, string clientToken)
     {
-        Thread thread = new Thread(() => StartWSConn(gotifyServerUrl, clientToken));
+        var thread = new Thread(() => StartWsConn(gotifyServerUrl, clientToken));
         thread.Start();
     }
 
-    private void StartWSConn(string gotifyServerUrl, string clientToken)
+    private static void StartWsConn(string gotifyServerUrl, string clientToken)
     {
         while (true)
         {
             try
             {
-                string? wsUrl = "";
-                string? socket = "";
+                string wsUrl;
+                string socket;
                 
                 socket = gotifyServerUrl.Contains("http://") ? "ws" : "wss";
                 gotifyServerUrl = gotifyServerUrl.Replace("http://", "").Replace("https://", "").Replace("\"", "");
@@ -68,13 +63,15 @@ public class GotifySocketService
                 
                 // Starting WebSocket instance
                 Console.WriteLine("Client connecting...");
-                WebSockClient wsc = new WebSockClient();
-                wsc.URL = wsUrl;
+                var wsc = new WebSockClient { URL = wsUrl };
                 wsc.Start(clientToken);
                 // Connect the client
 
                 // Fügen Sie den Thread und die zugehörige WebSocket-Verbindung zur Datenstruktur hinzu
-                WebsocketThreads.Add(clientToken, wsc);
+                if (_websocketThreads == null)
+                    _websocketThreads = new Dictionary<string, WebSockClient>();
+                
+                _websocketThreads.Add(clientToken, wsc);
                 
                 Thread.Sleep(Timeout.Infinite);
             }
@@ -92,19 +89,74 @@ public class GotifySocketService
     /// </summary>
     public async void Start()
     {
-        string? secntfyUrl = Environment.GetEnvironmentVariable("SECNTFY_SERVER_URL") ?? "https://api.secntfy.app";
+        var secntfyUrl = Environment.GetEnvironmentVariable("SECNTFY_SERVER_URL") ?? "https://api.secntfy.app";
 
-        List<Users> userList = await DatabaseService.GetUsers();
+        // [FEATURE REQUEST] #59 - https://github.com/androidseb25/iGotify-Notification-Assistent/issues/59
+        // First try of implementing local running instances without app configuration
+        var gotifyUrls = Environment.GetEnvironmentVariable("GOTIFY_URLS") ?? "";
+        var gotifyClientTokens = Environment.GetEnvironmentVariable("GOTIFY_CLIENT_TOKENS") ?? "";
+        var secntfyTokens = Environment.GetEnvironmentVariable("SECNTFY_TOKENS") ?? "";
+        
+        var gotifyUrlList = new List<string>();
+        var gotifyClientList = new List<string>();
+        var secntfyTokenList = new List<string>();
+        
+        if (gotifyUrls.Length > 0 && gotifyClientTokens.Length > 0 && secntfyTokens.Length > 0)
+        {
+            try
+            {
+                gotifyUrlList = gotifyUrls.Split(";").ToList();
+                gotifyClientList = gotifyClientTokens.Split(";").ToList();
+                secntfyTokenList = secntfyTokens.Split(";").ToList();
+
+                var clientCounter = 0;
+                foreach (string client in gotifyClientList)
+                {
+                    var dm = new DeviceModel();
+                    dm.ClientToken = client;
+                    if (!await DatabaseService.CheckIfUserExists(dm))
+                    {
+                        dm.GotifyUrl = gotifyUrlList.ElementAt(clientCounter);
+                        dm.DeviceToken = secntfyTokenList.ElementAt(clientCounter);
+                        if (!await DatabaseService.InsertUser(dm))
+                        {
+                            throw new ApplicationException("Insert Database Exception!");
+                        }
+                    }
+
+                    clientCounter++;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error: {e.Message}");
+                Console.WriteLine("Something went wrong when inserting you're connection!");
+                Console.WriteLine("Please check you're environment lists!");
+            }
+        }
+        else
+        {
+            var statusServerList = gotifyUrlList.Count == 0 ? "empty" : "filled";
+            Console.WriteLine($"Gotify Url list is: {statusServerList}");
+            var statusClientList = gotifyClientList.Count == 0 ? "empty" : "filled";
+            Console.WriteLine($"Gotify Client list is: {statusClientList}");
+            var statusNtfyList = secntfyTokenList.Count == 0 ? "empty" : "filled";
+            Console.WriteLine($"SecNtfy Token list is: {statusNtfyList}");
+            Console.WriteLine($"If one or more lists are empty please check the environment variable! GOTIFY_SERVERS or GOTIFY_CLIENTS or NTFY_TOKENS");
+            Console.WriteLine($"If all lists are empty do nothing, you will configure the gotify server over the iGotify app.");
+        }
+
+        var userList = await DatabaseService.GetUsers();
 
         StartConnection(userList, secntfyUrl);
     }
 
     private void StartConnection(List<Users> userList, string secntfyUrl)
     {
-        foreach (Users user in userList)
+        foreach (var user in userList)
         {
-            string isGotifyAvailable = "";
-            string isSecNtfyAvailable = "";
+            string isGotifyAvailable;
+            string isSecNtfyAvailable;
             try
             {
                 isGotifyAvailable = SecNtfy.CheckIfUrlReachable(user.GotifyUrl) ? "yes" : "no";
@@ -129,7 +181,7 @@ public class GotifySocketService
             Console.WriteLine($"Is SecNtfy Server - Url available: {isSecNtfyAvailable}");
             Console.WriteLine($"Client - Token: {user.ClientToken}");
             
-            StartWSThread(user.GotifyUrl, user.ClientToken);
+            StartWsThread(user.GotifyUrl, user.ClientToken);
         }
     }
 

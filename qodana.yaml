@@ -1,31 +1,33 @@
+#-------------------------------------------------------------------------------#
+#               Qodana analysis is configured by qodana.yaml file               #
+#             https://www.jetbrains.com/help/qodana/qodana-yaml.html            #
+#-------------------------------------------------------------------------------#
 version: "1.0"
-linter: jetbrains/qodana-dotnet:2023.3
-include:
-  - name: AutoPropertyCanBeMadeGetOnly.Global
-  - name: AutoPropertyCanBeMadeGetOnly.Local
-  - name: ConvertToConstant.Local
-  - name: FieldCanBeMadeReadOnly.Global
-  - name: MemberCanBePrivate.Global
-  - name: MemberCanBeMadeStatic.Global
-  - name: MemberCanBeMadeStatic.Local
-  - name: PropertyCanBeMadeInitOnly.Global
-  - name: ConvertIfStatementToNullCoalescingExpression
-  - name: ConvertIfStatementToSwitchStatement
-  - name: ConvertToPrimaryConstructor
-  - name: ConvertToUsingDeclaration
-  - name: InvertIf
-  - name: MergeIntoPattern
-  - name: UseCollectionExpression
-  - name: UseObjectOrCollectionInitializer
-  - name: ClassNeverInstantiated.Global
-  - name: RedundantStringInterpolation
-  - name: UnusedType.Global
-  - name: UnusedMember.Global
-  - name: CA1822
-  - name: CA2211
-  - name: CA1859
-  - name: ArrangeThisQualifier
-  - name: SuggestVarOrType_Elsewhere
-  - name: SuggestVarOrType_BuiltInTypes
-  - name: SuggestVarOrType_SimpleTypes
-  - name: ArrangeObjectCreationWhenTypeEvident
+
+#Specify IDE code to run analysis without container (Applied in CI/CD pipeline)
+ide: QDNET
+
+#Specify inspection profile for code analysis
+profile:
+  name: qodana.starter
+exclude:
+  - name: All
+    paths:
+      - Models/ServerVersion.cs
+
+#Enable inspections
+#include:
+#  - name: <SomeEnabledInspectionId>
+
+#Disable inspections
+#exclude:
+#  - name: <SomeDisabledInspectionId>
+#    paths:
+#      - <path/where/not/run/inspection>
+
+#Execute shell command before Qodana execution (Applied in CI/CD pipeline)
+#bootstrap: sh ./prepare-qodana.sh
+
+#Install IDE plugins before Qodana execution (Applied in CI/CD pipeline)
+#plugins:
+#  - id: <plugin.id> #(plugin id can be found at https://plugins.jetbrains.com)

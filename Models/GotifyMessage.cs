@@ -2,13 +2,13 @@ namespace iGotify_Notification_Assist.Models;
 
 public class GotifyMessage
 {
-    public int appid { get; set; }
-    public string? date { get; set; }
     public int id { get; set; }
+    public int appid { get; set; }
     public string? message { get; set; }
+    public string? title { get; set; }
     public int priority { get; set; }
     public GotifyExtras? extras { get; set; }
-    public string? title { get; set; }
+    public string? date { get; set; }
 }
 
 public class GotifyExtras

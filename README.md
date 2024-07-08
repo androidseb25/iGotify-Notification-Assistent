@@ -1,6 +1,7 @@
 [![Donate with PayPal](https://raw.githubusercontent.com/androidseb25/iGotify-Notification-Assistent/main/paypal-donate-icon-7_20.png)](https://www.paypal.com/donate/?hosted_button_id=VFSL9ZECRD6D6)
 ![Stars](https://img.shields.io/github/stars/androidseb25/iGotify-Notification-Assistent?style=flat&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAEsWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS41LjAiPgogPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iCiAgICB4bWxuczpleGlmPSJodHRwOi8vbnMuYWRvYmUuY29tL2V4aWYvMS4wLyIKICAgIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIKICAgIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIKICAgIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIgogICAgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIKICAgdGlmZjpJbWFnZUxlbmd0aD0iNDgiCiAgIHRpZmY6SW1hZ2VXaWR0aD0iNDgiCiAgIHRpZmY6UmVzb2x1dGlvblVuaXQ9IjIiCiAgIHRpZmY6WFJlc29sdXRpb249IjcyLzEiCiAgIHRpZmY6WVJlc29sdXRpb249IjcyLzEiCiAgIGV4aWY6UGl4ZWxYRGltZW5zaW9uPSI0OCIKICAgZXhpZjpQaXhlbFlEaW1lbnNpb249IjQ4IgogICBleGlmOkNvbG9yU3BhY2U9IjEiCiAgIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiCiAgIHBob3Rvc2hvcDpJQ0NQcm9maWxlPSJzUkdCIElFQzYxOTY2LTIuMSIKICAgeG1wOk1vZGlmeURhdGU9IjIwMjMtMDQtMTlUMTc6NDE6MDIrMDI6MDAiCiAgIHhtcDpNZXRhZGF0YURhdGU9IjIwMjMtMDQtMTlUMTc6NDE6MDIrMDI6MDAiPgogICA8eG1wTU06SGlzdG9yeT4KICAgIDxyZGY6U2VxPgogICAgIDxyZGY6bGkKICAgICAgc3RFdnQ6YWN0aW9uPSJwcm9kdWNlZCIKICAgICAgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWZmaW5pdHkgUGhvdG8gMiAyLjAuNCIKICAgICAgc3RFdnQ6d2hlbj0iMjAyMy0wNC0xOVQxNzo0MTowMiswMjowMCIvPgogICAgPC9yZGY6U2VxPgogICA8L3htcE1NOkhpc3Rvcnk+CiAgPC9yZGY6RGVzY3JpcHRpb24+CiA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgo8P3hwYWNrZXQgZW5kPSJyIj8+0oDKYwAAAYFpQ0NQc1JHQiBJRUM2MTk2Ni0yLjEAACiRdZHfK4NRGMc/hiamKS5cuFgaV5tmanGjTEItaaYMN9u7X2o/3t53S8utcqsocePXBX8Bt8q1UkRKbrkmbliv591WW7Ln9Jznc77nPE/nPAcsobSS0Vs8kMnmteC037EUXnZYX2mhGzuDWCOKrk7MzwdoaF8PNJnxzm3WanzuX+uIxXUFmtqExxVVywvPCAfW86rJu8I9SioSEz4XdmlyQeF7U49W+M3kZIV/TNZCwUmwdAk7knUcrWMlpWWE5eU4M+mCUr2P+RJbPLu4ILFfvA+dINP4cTDLFJP4GGZMZh9uvAzJigb5nnL+HDnJVWRWKaKxRpIUeVyiFqR6XGJC9LiMNEWz/3/7qidGvJXqNj+0vhjGxwBYd6C0bRjfx4ZROoHmZ7jK1vJzRzD6Kfp2TXMegn0TLq5rWnQPLreg90mNaJGy1CxuSSTg/Qw6w9B9C+0rlZ5V9zl9hNCGfNUN7B/AoJy3r/4CMN5nzbh35xIAAAAJcEhZcwAACxMAAAsTAQCanBgAAAGYSURBVGiB7VjtjcMgDH2cbhx2KJ2syWSlO2Qf+sd3iji+7NhJT+JJVSKCsY39sCkwMTExMTFhhLRhSRvC1XaIQMYn+i1Wer6sFgZw270/rJSYOEBpE7KxxUKXVQTMdjyH016Qdv9Z+Xx3HlFTn0UEWrsftJVZRCA1FXpdnaoRGDnztcmsuhtpwxMDaaIZBbUIlI7OxtxFSy9rJ7IU2b/fwCNopOerMAbOSVV1gIx9MA3TRqTnWnPquyF8tfHI9MfShBYHXo1vZ6NqS5MDRLbT2oIKVufrpO+S+GInmsYDg6dQp7+xQtd4gHGMnuzEcNPHroij1VaI6DzuHAF2JSYFkSs3gJVrPCBsJUjRKpGtYCjfSzjSC8UDsmprWV7qOQhSwSMOXF3gABy4D/RuXmxDhHcEUQQ+6d+2T+GA+JIjdYCT/1GoYwiWEVidh2PUjFt/yl+IiNMhcLEojdzwJERmR6BD4GpFdf63z6m2IhIeSFIoFMZ+0qVrwM4RlVbkKAeGDc9BMnk0YmmuOtKGoFkLtNebmJj4R3gDsdt6T8W+vnEAAAAASUVORK5CYII=)
 [![Crowdin](https://badges.crowdin.net/igotify/localized.svg)](https://crowdin.com/project/igotify)
+[![Qodana](https://github.com/androidseb25/iGotify-Notification-Assistent/actions/workflows/code_quality.yml/badge.svg?branch=main)](https://github.com/androidseb25/iGotify-Notification-Assistent/actions/workflows/code_quality.yml)
 
 # iGotify
 
@@ -36,6 +37,20 @@ Download Link to iGotify down below
 
 * `GOTIFY_DEFAULTUSER_PASS` = the user password for the defaultuser
 
+### oOptional environment variables
+
+* `GOTIFY_URLS` = the local gotify sever URL e.g.: `http://gotify`
+* `GOTIFY_CLIENT_TOKENS` = the client token from the Gotify Client e.g.: `cXXXXXXXX`
+* `SECNTFY_TOKENS` = the SecNtfy Token that you get from the app after configure it e.g.: `NTFY-DEVICE-XXXXXX`
+
+#### All these configuration can be found after configure the app. It will display it for you
+#### Please note you can configure multiple instances of local gotify server by adding a semicolon `;` after each environment value e.g.:
+
+* `GOTIFY_URLS: 'http://gotify;http://gotify2;http://gotify3;...'`
+* `GOTIFY_CLIENT_TOKENS: 'cXXXXXXXX1;cXXXXXXXX2;cXXXXXXXX3;...'`
+* `SECNTFY_TOKENS: 'NTFY-DEVICE-XXXXXX1;NTFY-DEVICE-XXXXXX2;NTFY-DEVICE-XXXXXX3;...'`
+
+&nbsp;
 
 ```bash
 version: '3.8'
@@ -57,7 +72,6 @@ services:
     volumes:
       - data:/app/data
     environment:
-      TZ:                       'Europe/Berlin'
       GOTIFY_DEFAULTUSER_PASS:  'my-very-strong-password'   # Change me!!!!!
 
   igotify:
@@ -74,6 +88,10 @@ services:
       - "8681:8080"
     volumes:
       - api-data:/app/data
+    #environment:                 # option environment see above note
+    #  GOTIFY_URLS:          ''
+    #  GOTIFY_CLIENT_TOKENS: ''
+    #  SECNTFY_TOKENS:       ''
 
 networks:
   net:
@@ -119,7 +137,6 @@ services:
     volumes:
       - data:/app/data
     environment:
-      TZ:                       'Europe/Berlin'
       GOTIFY_DEFAULTUSER_PASS:  'my-very-strong-password'   # Change me!!!!!
       GOTIFY_REGISTRATION:       'false'
     labels:
@@ -150,6 +167,12 @@ services:
     pull_policy: always
     volumes:
       - api-data:/app/data
+      
+    #environment:                 # option environment see above note
+    #  GOTIFY_URLS:          ''
+    #  GOTIFY_CLIENT_TOKENS: ''
+    #  SECNTFY_TOKENS:       ''
+    
     labels:
       traefik.docker.network: proxy
       traefik.enable: "true"
