@@ -37,7 +37,7 @@ Download Link to iGotify down below
 
 * `GOTIFY_DEFAULTUSER_PASS` = the user password for the defaultuser
 
-### oOptional environment variables
+### Optional environment variables
 
 * `GOTIFY_URLS` = the local gotify sever URL e.g.: `http://gotify`
 * `GOTIFY_CLIENT_TOKENS` = the client token from the Gotify Client e.g.: `cXXXXXXXX`
