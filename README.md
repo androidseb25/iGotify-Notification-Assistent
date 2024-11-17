@@ -57,9 +57,7 @@ services:
   gotify:
     container_name: gotify
     hostname: gotify
-    image: gotify/server          # Uncommand correct server image
-    # image: gotify/server-arm7
-    # image: gotify/server-arm64
+    image: gotify/server
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -126,9 +124,7 @@ services:
   gotify:
     container_name: gotify
     hostname: gotify
-    image: gotify/server          # Uncommand correct server image
-    # image: gotify/server-arm7
-    # image: gotify/server-arm64
+    image: gotify/server
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
