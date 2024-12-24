@@ -1,6 +1,7 @@
 using iGotify_Notification_Assist.Services;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
+using Environments = iGotify_Notification_Assist.Services.Environments;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,9 +34,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-string enableScalarUiString = Environment.GetEnvironmentVariable("ENABLES_SCALAR_UI") ?? "false";
-
-if (enableScalarUiString == "true")
+if (Environments.enableScalarUi)
 {
     app.MapOpenApi();
     app.MapScalarApiReference(options =>

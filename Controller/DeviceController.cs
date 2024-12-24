@@ -2,6 +2,7 @@ using iGotify_Notification_Assist.Models;
 using iGotify_Notification_Assist.Services;
 using Microsoft.AspNetCore.Mvc;
 using SecNtfyNuGet;
+using Environments = iGotify_Notification_Assist.Services.Environments;
 
 namespace iGotify_Notification_Assist.Controller;
 
@@ -91,10 +92,11 @@ public class DeviceController : ControllerBase
     [HttpGet("Test/{deviceToken}")]
     public async Task<IActionResult> Test(string deviceToken)
     {
-        var ntfy = new SecNtfy(Environment.GetEnvironmentVariable("SECNTFY_SERVER_URL") ?? "https://api.secntfy.app");
+        var ntfy = new SecNtfy(Environments.secNtfyUrl);
         if (deviceToken.Length > 0)
             _ = await ntfy.SendNotification(deviceToken, "Test", "Test Nachricht");
-        Console.WriteLine(ntfy.encTitle);
+        if (Environments.isLogEnabled)
+            Console.WriteLine(ntfy.encTitle);
 
         return Ok();
     }
