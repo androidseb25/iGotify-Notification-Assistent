@@ -1,5 +1,6 @@
 using iGotify_Notification_Assist.Services;
 using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,12 +15,7 @@ builder.Services.AddControllers(opt => { opt.SuppressImplicitRequiredAttributeFo
     });
 
 builder.Services.AddSingleton(builder.Configuration);
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "iGotify Notification Assist API", Version = "v1" });
-});
+builder.Services.AddOpenApi();
 
 builder.Services.AddTransient<IStartupFilter, StartUpBuilder>();
 
@@ -37,17 +33,20 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-// Enable middleware to serve generated Swagger as a JSON endpoint.
-app.UseSwagger(c => { c.RouteTemplate = "/swagger/{documentName}/swagger.json"; });
+string enableScalarUiString = Environment.GetEnvironmentVariable("ENABLES_SCALAR_UI") ?? "false";
 
-// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-// specifying the Swagger JSON endpoint.
-app.UseSwaggerUI(c =>
+if (enableScalarUiString == "true")
 {
-    c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "iGotify Notification Assist API");
-    c.RoutePrefix = string.Empty;
-    c.DefaultModelsExpandDepth(-1);
-});
+    app.MapOpenApi();
+    app.MapScalarApiReference(options =>
+    {
+        options.WithTitle("iGotify Notification Assist API")
+            .WithModels(false)
+            .WithLayout(ScalarLayout.Classic)
+            .WithTheme(ScalarTheme.Moon)
+            .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+    });
+}
 
 //app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
