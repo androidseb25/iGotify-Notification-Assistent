@@ -71,7 +71,11 @@ public class GotifySocketService
                 if (_websocketThreads == null)
                     _websocketThreads = new Dictionary<string, WebSockClient>();
                 
-                _websocketThreads.Add(clientToken, wsc);
+                _websocketThreads.TryGetValue(clientToken, out var storedWebSockClient);
+                if (storedWebSockClient == null)
+                    _websocketThreads.Add(clientToken, wsc);
+                else 
+                    Console.WriteLine($"Client: {clientToken} already connected! Skipping...");
                 
                 Thread.Sleep(Timeout.Infinite);
             }
