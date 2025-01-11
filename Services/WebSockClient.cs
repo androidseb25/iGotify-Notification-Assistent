@@ -65,7 +65,8 @@ public class WebSockClient
                 var message = msg.ToString().Replace("client::display", "clientdisplay")
                     .Replace("client::notification", "clientnotification")
                     .Replace("android::action", "androidaction");
-                Console.WriteLine("Message converted: " + message);
+                if (Environments.isLogEnabled)
+                    Console.WriteLine("Message converted: " + message);
                 // var jsonData = JsonConvert.SerializeObject(message);
                 var gm = JsonConvert.DeserializeObject<GotifyMessage>(message);
                 // If object is null return and listen to the next message

@@ -118,7 +118,7 @@ jobs:
     name: Build dotNet
     strategy:
       matrix:
-        dotnet-version: [ '8.x' ]
+        dotnet-version: [ '9.x' ]
         kind: [ 'amd64', 'arm64', 'armv7' ]
         include:
           - kind: amd64

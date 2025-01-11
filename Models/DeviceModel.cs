@@ -1,6 +1,7 @@
 using iGotify_Notification_Assist.Services;
 using SecNtfyNuGet;
 using Websocket.Client;
+using Environments = iGotify_Notification_Assist.Services.Environments;
 
 namespace iGotify_Notification_Assist.Models;
 
@@ -52,7 +53,7 @@ public class DeviceModel
             Console.WriteLine("THERE'S SOMETHING WRONG HERE? NO USER FOUND");
         }
         
-        var ntfy = new SecNtfy(Environment.GetEnvironmentVariable("SECNTFY_SERVER_URL") ?? "https://api.secntfy.app");
+        var ntfy = new SecNtfy(Environments.secNtfyUrl);
         _ = ntfy.SendNotification(usr.DeviceToken, title, msg, iGotifyMessage.priority == 10, imageUrl, iGotifyMessage.priority);
     }
 }

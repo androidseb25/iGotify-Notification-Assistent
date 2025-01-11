@@ -1,26 +1,32 @@
 using iGotify_Notification_Assist.Services;
+using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
+using Environments = iGotify_Notification_Assist.Services.Environments;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddCors();
 
-builder.Services.AddControllers(opt => { opt.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true; })
+builder.Services.AddControllers(opt =>
+    {
+        opt.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+    })
     .AddJsonOptions(opt =>
     {
         opt.JsonSerializerOptions.PropertyNamingPolicy = null;
         opt.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
     });
-
-builder.Services.AddSingleton(builder.Configuration);
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+builder.Services.Configure<JsonOptions>(options =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "iGotify Notification Assist API", Version = "v1" });
+    options.SerializerOptions.PropertyNameCaseInsensitive = true; // Enable case-insensitivity
+    options.SerializerOptions.PropertyNamingPolicy = null; // Preserve exact casing
 });
 
+builder.Services.AddSingleton(builder.Configuration);
+builder.Services.AddOpenApi();
 builder.Services.AddTransient<IStartupFilter, StartUpBuilder>();
 
 var app = builder.Build();
@@ -37,17 +43,18 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-// Enable middleware to serve generated Swagger as a JSON endpoint.
-app.UseSwagger(c => { c.RouteTemplate = "/swagger/{documentName}/swagger.json"; });
-
-// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-// specifying the Swagger JSON endpoint.
-app.UseSwaggerUI(c =>
+if (Environments.enableScalarUi)
 {
-    c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "iGotify Notification Assist API");
-    c.RoutePrefix = string.Empty;
-    c.DefaultModelsExpandDepth(-1);
-});
+    app.MapOpenApi();
+    app.MapScalarApiReference(options =>
+    {
+        options.WithTitle("iGotify Notification Assist API")
+            .WithModels(false)
+            .WithLayout(ScalarLayout.Classic)
+            .WithTheme(ScalarTheme.Moon)
+            .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+    });
+}
 
 //app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 

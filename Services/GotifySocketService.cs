@@ -71,7 +71,11 @@ public class GotifySocketService
                 if (_websocketThreads == null)
                     _websocketThreads = new Dictionary<string, WebSockClient>();
                 
-                _websocketThreads.Add(clientToken, wsc);
+                _websocketThreads.TryGetValue(clientToken, out var storedWebSockClient);
+                if (storedWebSockClient == null)
+                    _websocketThreads.Add(clientToken, wsc);
+                else 
+                    Console.WriteLine($"Client: {clientToken} already connected! Skipping...");
                 
                 Thread.Sleep(Timeout.Infinite);
             }
@@ -89,13 +93,13 @@ public class GotifySocketService
     /// </summary>
     public async void Start()
     {
-        var secntfyUrl = Environment.GetEnvironmentVariable("SECNTFY_SERVER_URL") ?? "https://api.secntfy.app";
+        var secntfyUrl = Environments.secNtfyUrl;
 
         // [FEATURE REQUEST] #59 - https://github.com/androidseb25/iGotify-Notification-Assistent/issues/59
         // First try of implementing local running instances without app configuration
-        var gotifyUrls = Environment.GetEnvironmentVariable("GOTIFY_URLS") ?? "";
-        var gotifyClientTokens = Environment.GetEnvironmentVariable("GOTIFY_CLIENT_TOKENS") ?? "";
-        var secntfyTokens = Environment.GetEnvironmentVariable("SECNTFY_TOKENS") ?? "";
+        var gotifyUrls = Environments.gotifyUrls;
+        var gotifyClientTokens = Environments.gotifyClientTokens;
+        var secntfyTokens = Environments.secNtfyTokens;
         
         var gotifyUrlList = new List<string>();
         var gotifyClientList = new List<string>();
