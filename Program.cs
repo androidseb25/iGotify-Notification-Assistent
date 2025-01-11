@@ -1,4 +1,6 @@
 using iGotify_Notification_Assist.Services;
+using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using Environments = iGotify_Notification_Assist.Services.Environments;
@@ -8,16 +10,23 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddCors();
 
-builder.Services.AddControllers(opt => { opt.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true; })
+builder.Services.AddControllers(opt =>
+    {
+        opt.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+    })
     .AddJsonOptions(opt =>
     {
         opt.JsonSerializerOptions.PropertyNamingPolicy = null;
         opt.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
     });
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.PropertyNameCaseInsensitive = true; // Enable case-insensitivity
+    options.SerializerOptions.PropertyNamingPolicy = null; // Preserve exact casing
+});
 
 builder.Services.AddSingleton(builder.Configuration);
 builder.Services.AddOpenApi();
-
 builder.Services.AddTransient<IStartupFilter, StartUpBuilder>();
 
 var app = builder.Build();

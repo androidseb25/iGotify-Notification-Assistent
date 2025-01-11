@@ -19,7 +19,7 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
         <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="Scalar.AspNetCore" Version="1.2.72" />
+        <PackageReference Include="Scalar.AspNetCore" Version="1.2.75" />
         <PackageReference Include="secntfy.nuget" Version="1.0.5" />
         <PackageReference Include="Websocket.Client" Version="5.1.2" />
     </ItemGroup>
