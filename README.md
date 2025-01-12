@@ -40,6 +40,10 @@ Download Link to iGotify down below
 * `GOTIFY_URLS` = the local gotify sever URL e.g.: `http://gotify`
 * `GOTIFY_CLIENT_TOKENS` = the client token from the Gotify Client e.g.: `cXXXXXXXX`
 * `SECNTFY_TOKENS` = the SecNtfy Token that you get from the app after configure it e.g.: `NTFY-DEVICE-XXXXXX`
+* `ENABLE_CONSOLE_LOG` = you can disable unnecessary console logs (default: true)
+* `ENABLE_SCALAR_UI` = you can now disable the Endpoint page (default: true)
+
+*please write the boolean variables (true, false) in single quotes 'true'*
 
 #### All these configuration can be found after configure the app. It will display it for you
 #### Please note you can configure multiple instances of local gotify server by adding a semicolon `;` after each environment value e.g.:
