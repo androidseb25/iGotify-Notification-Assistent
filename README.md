@@ -55,8 +55,7 @@ Download Link to iGotify down below
 &nbsp;
 
 ```bash
-version: '3.8'
-
+---
 services:
   gotify:
     container_name: gotify
@@ -122,8 +121,7 @@ Also **don't** check the boxes which say "HTTP/2 Support" and "HSTS enabled".
 ### Traefik Config
 
 ```bash
-version: "3.8"
-
+---
 services:
   gotify:
     container_name: gotify
@@ -152,8 +150,6 @@ services:
     networks:
       default: null
       proxy: null
-    volumes:
-      - data:/app/data
 
   igotify-notification: # (iGotify-Notification-Assistent)
     container_name: igotify
