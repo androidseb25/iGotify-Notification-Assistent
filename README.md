@@ -55,8 +55,6 @@ Download Link to iGotify down below
 &nbsp;
 
 ```bash
-version: '3.8'
-
 services:
   gotify:
     container_name: gotify
@@ -82,6 +80,11 @@ services:
     security_opt:
       - no-new-privileges:true
     pull_policy: always
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/Version" ]
+      interval: "3s"
+      timeout: "3s"
+      retries: 5
     networks:
       - net
     ports:
@@ -122,8 +125,6 @@ Also **don't** check the boxes which say "HTTP/2 Support" and "HSTS enabled".
 ### Traefik Config
 
 ```bash
-version: "3.8"
-
 services:
   gotify:
     container_name: gotify
@@ -152,8 +153,6 @@ services:
     networks:
       default: null
       proxy: null
-    volumes:
-      - data:/app/data
 
   igotify-notification: # (iGotify-Notification-Assistent)
     container_name: igotify
@@ -163,6 +162,11 @@ services:
     security_opt:
       - no-new-privileges:true
     pull_policy: always
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/Version" ]
+      interval: "3s"
+      timeout: "3s"
+      retries: 5
     volumes:
       - api-data:/app/data
       
