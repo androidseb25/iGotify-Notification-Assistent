@@ -51,6 +51,8 @@ Download Link to iGotify down below
 * `GOTIFY_URLS: 'http://gotify;http://gotify2;http://gotify3;...'`
 * `GOTIFY_CLIENT_TOKENS: 'cXXXXXXXX1;cXXXXXXXX2;cXXXXXXXX3;...'`
 * `SECNTFY_TOKENS: 'NTFY-DEVICE-XXXXXX1;NTFY-DEVICE-XXXXXX2;NTFY-DEVICE-XXXXXX3;...'`
+ 
+__You don't need this variables, if the iGotify-Instance is public or local accessible.__ See [issue #151](https://github.com/androidseb25/iGotify-Notification-Assistent/issues/151)  
 
 &nbsp;
 
