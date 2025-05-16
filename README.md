@@ -28,7 +28,7 @@ Download Link to iGotify down below
 2. Please use the latest and recommended version of docker and docker compose
 3. Copy the code down below in the yaml file
 4. change environment variables in the compose file
-5. execute `docker compose up -d` to start the docker compose
+5. execute `docker-compose up -d` to start the docker compose
 
 &nbsp;
 ### Needed environment variables
