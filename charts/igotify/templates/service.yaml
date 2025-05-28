@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gotify
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.gotify.servicePort }}
+      targetPort: {{ .Values.gotify.containerPort }}
+      protocol: TCP
+      name: http
+  selector:
+    app: gotify
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: igotify
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.igotify.servicePort }}
+      targetPort: {{ .Values.igotify.containerPort }}
+      protocol: TCP
+      name: http
+  selector:
+    app: igotify
+

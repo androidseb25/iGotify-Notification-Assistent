@@ -1,0 +1,75 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gotify
+  labels:
+    app: gotify
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gotify
+  template:
+    metadata:
+      labels:
+        app: gotify
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: gotify
+          image: {{ .Values.gotify.image }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .Values.gotify.containerPort }}
+          env:
+            - name: TZ
+              value: {{ .Values.gotify.env.TZ }}
+            - name: GOTIFY_DEFAULTUSER_PASS
+              value: {{ .Values.gotify.env.GOTIFY_DEFAULTUSER_PASS }}
+          volumeMounts:
+            - name: gotify-data
+              mountPath: {{ .Values.gotify.volumeMountPath }}
+      volumes:
+        - name: gotify-data
+          persistentVolumeClaim:
+            claimName: gotify-data
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: igotify
+  labels:
+    app: igotify
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: igotify
+  template:
+    metadata:
+      labels:
+        app: igotify
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: igotify
+          image: {{ .Values.igotify.image }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.igotify.containerPort }}
+          env:
+            - name: IGOTIFY_CLIENT_TOKEN
+              value: {{ .Values.igotify.env.IGOTIFY_CLIENT_TOKEN }}
+            - name: GOTIFY_SERVER_URL
+              value: {{ .Values.igotify.env.GOTIFY_SERVER_URL }}
+          volumeMounts:
+            - name: igotify-data
+              mountPath: {{ .Values.igotify.volumeMountPath }}
+      volumes:
+        - name: igotify-data
+          persistentVolumeClaim:
+            claimName: igotify-data
