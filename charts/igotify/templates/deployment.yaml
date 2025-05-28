@@ -1,77 +1,81 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gotify
+  name: {{ include "igotify.fullname" . }}
   labels:
-    app: gotify
+    {{- include "igotify.labels" . | nindent 4 }}
 spec:
-  replicas: 1
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
-      app: gotify
+      {{- include "igotify.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
-        app: gotify
+        {{- include "igotify.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "igotify.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
       securityContext:
-        runAsNonRoot: true
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
-        - name: gotify
-          image: {{ .Values.gotify.image }}
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: {{ .Values.gotify.containerPort }}
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: TZ
-              value: {{ .Values.gotify.env.TZ }}
-            - name: GOTIFY_DEFAULTUSER_PASS
-              value: {{ .Values.gotify.env.GOTIFY_DEFAULTUSER_PASS }}
-          volumeMounts:
-            - name: gotify-data
-              mountPath: {{ .Values.gotify.volumeMountPath }}
-      volumes:
-        - name: gotify-data
-          persistentVolumeClaim:
-            claimName: gotify-data
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: igotify
-  labels:
-    app: igotify
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: igotify
-  template:
-    metadata:
-      labels:
-        app: igotify
-    spec:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        fsGroup: 1000
-      containers:
-        - name: igotify
-          image: {{ .Values.igotify.image }}
-          imagePullPolicy: Always
+            - name: ASPNETCORE_URLS
+              value: "http://0.0.0.0:5000"
           ports:
-            - containerPort: {{ .Values.igotify.containerPort }}
-          env:
-            - name: IGOTIFY_CLIENT_TOKEN
-              value: {{ .Values.igotify.env.IGOTIFY_CLIENT_TOKEN }}
-            - name: GOTIFY_SERVER_URL
-              value: {{ .Values.igotify.env.GOTIFY_SERVER_URL }}
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
           volumeMounts:
-            - name: igotify-data
-              mountPath: {{ .Values.igotify.volumeMountPath }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
       volumes:
-        - name: igotify-data
-          persistentVolumeClaim:
-            claimName: igotify-data
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

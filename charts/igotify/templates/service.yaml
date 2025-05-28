@@ -1,30 +1,15 @@
----
 apiVersion: v1
 kind: Service
 metadata:
-  name: gotify
+  name: {{ include "igotify.fullname" . }}
+  labels:
+    {{- include "igotify.labels" . | nindent 4 }}
 spec:
-  type: ClusterIP
+  type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.gotify.servicePort }}
-      targetPort: {{ .Values.gotify.containerPort }}
+    - port: {{ .Values.service.port }}
+      targetPort: 5000
       protocol: TCP
       name: http
   selector:
-    app: gotify
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: igotify
-spec:
-  type: ClusterIP
-  ports:
-    - port: {{ .Values.igotify.servicePort }}
-      targetPort: {{ .Values.igotify.containerPort }}
-      protocol: TCP
-      name: http
-  selector:
-    app: igotify
-
+    {{- include "igotify.selectorLabels" . | nindent 4 }}

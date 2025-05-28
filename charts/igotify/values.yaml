@@ -1,49 +1,96 @@
+# Default values for gotify
 gotify:
-  image: gotify/server:latest
-  containerPort: 80
-  servicePort: 1337
+  ingress:
+    enabled: false
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    hosts:
+      - host: gotify.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: ""
+  service:
+    port: 1337
   env:
     TZ: "Europe/Berlin"
-    GOTIFY_DEFAULTUSER_PASS: "test1234"
-  volumeMountPath: /app/data
+    GOTIFY_DEFAULTUSER_PASS: "change_this_admin_password"
 
-igotify:
-  image: ghcr.io/androidseb25/igotify-notification-assist:latest
-  containerPort: 8080
-  servicePort: 1338
-  env:
-    IGOTIFY_CLIENT_TOKEN: "Cyirsn0q.hYe3si"
-    GOTIFY_SERVER_URL: "http://gotify"
-  volumeMountPath: /app/data
 
-persistence:
-  gotify:
-    enabled: true
-    size: 1Gi
-    storageClassName: ""
-  igotify:
-    enabled: true
-    size: 1Gi
-    storageClassName: ""
+# Default values for igotify.
+replicaCount: 1
+
+image:
+  #repository: ghcr.io/androidseb25/igotify-notification-assist
+  repository: cellexec/igotify
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: "igotify-notification"
+fullnameOverride: "igotify-notification"
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
 
 ingress:
   enabled: false
-  className: nginx
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-  gotifyHost: gotify.example.com
-  igotifyHost: igotify.example.com
-
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Automatically mount a ServiceAccount's API credentials?
-  automount: true
-  # Annotations to add to the service account
+  className: ""
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+livenessProbe:
+  httpGet:
+    path: /version
+    port: 5000
+
+readinessProbe:
+  httpGet:
+    path: /version
+    port: 5000
 
 autoscaling:
   enabled: false
@@ -51,3 +98,21 @@ autoscaling:
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
+
+volumes: []
+# - name: igotify-data
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: igotify-data
+#   mountPath: "/app/data"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
