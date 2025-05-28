@@ -14,8 +14,6 @@ gotify:
     enabled: true
     size: 1Gi
     storageClass: ""
-  service:
-    port: 1337
   env:
     TZ: "Europe/Berlin"
     GOTIFY_DEFAULTUSER_PASS: "change_this_admin_password"
