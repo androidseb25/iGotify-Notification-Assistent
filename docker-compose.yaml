@@ -1,21 +1,23 @@
+version: '3.8'
+
 services:
   gotify:
     container_name: gotify
     hostname: gotify
-    image: gotify/server:latest
+    image: gotify/server          # Uncommand correct server image
+    # image: gotify/server-arm7
+    # image: gotify/server-arm64
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     networks:
       - net
-      - default
     ports:
-      - "1337:80"
+      - "8680:80"
     volumes:
-      - ./data:/app/data
+      - data:/app/data
     environment:
-      TZ:                       'Europe/Berlin'
-      GOTIFY_DEFAULTUSER_PASS:  'test1234'
+      GOTIFY_DEFAULTUSER_PASS:  'my-very-strong-password'   # Change me!!!!!
 
   igotify:
     container_name: igotify
@@ -27,14 +29,14 @@ services:
     pull_policy: always
     networks:
       - net
-      - default
     ports:
-      - "1338:8080"
-    environment:
-      - IGOTIFY_CLIENT_TOKEN='Cyirsn0q.hYe3si'
-      - GOTIFY_SERVER_URL="http://gotify"
+      - "8681:8080"
     volumes:
-      - ./api-data:/app/data
+      - api-data:/app/data
+    #environment:                 # option environment see above note
+    #  GOTIFY_URLS:          ''
+    #  GOTIFY_CLIENT_TOKENS: ''
+    #  SECNTFY_TOKENS:       ''
 
 networks:
   net:
