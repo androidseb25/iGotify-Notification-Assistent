@@ -1,0 +1,6 @@
+dependencies:
+- name: gotify
+  repository: https://pmoscode-helm.github.io/gotify/
+  version: 0.5.2
+digest: sha256:c6c1e934ae5402663be457b1f2ffb40d9d2e59f04dd9b2cbebbd7ccb0f444ea2
+generated: "2025-05-28T11:52:42.177530614Z"
