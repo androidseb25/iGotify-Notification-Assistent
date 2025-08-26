@@ -37,9 +37,11 @@ services:
     volumes:
       - api-data:/app/data
     #environment:                 # option environment see above note
-    #  GOTIFY_URLS:          ''
-    #  GOTIFY_CLIENT_TOKENS: ''
-    #  SECNTFY_TOKENS:       ''
+    # GOTIFY_URLS: ''
+    # GOTIFY_CLIENT_TOKENS: ''
+    # SECNTFY_TOKENS: ''
+    # ENABLE_CONSOLE_LOG: 'true'
+    # ENABLE_SCALAR_UI: 'true'
 
 networks:
   net:

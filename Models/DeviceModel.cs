@@ -41,19 +41,23 @@ public class DeviceModel
     {
         var title = iGotifyMessage.title;
         var msg = iGotifyMessage.message;
-        
+
         var protocol = webSock.Url.ToString().Contains("ws://") ? "http://" : "https://";
-        var gotifyServerUrl = webSock.Url.ToString().Replace("ws://", "").Replace("wss://", "").Replace("\"", "").Split("/stream");
-        var imageUrl = gotifyServerUrl.Length > 0 ? $"{protocol}{gotifyServerUrl[0]}$$${iGotifyMessage.appid}$$${webSock.Name}" : "";
-        
+        var gotifyServerUrl = webSock.Url.ToString().Replace("ws://", "").Replace("wss://", "").Replace("\"", "")
+            .Split("/stream");
+        var imageUrl = gotifyServerUrl.Length > 0
+            ? $"{protocol}{gotifyServerUrl[0]}$$${iGotifyMessage.appid}$$${webSock.Name}"
+            : "";
+
         var usr = await DatabaseService.GetUser(webSock.Name!);
 
         if (usr.Uid == 0)
         {
             Console.WriteLine("THERE'S SOMETHING WRONG HERE? NO USER FOUND");
         }
-        
+
         var ntfy = new SecNtfy(Environments.secNtfyUrl);
-        _ = ntfy.SendNotification(usr.DeviceToken, title, msg, iGotifyMessage.priority == 10, imageUrl, iGotifyMessage.priority);
+        _ = ntfy.SendNotification(usr.DeviceToken, title, msg, iGotifyMessage.priority == 10, imageUrl,
+            iGotifyMessage.priority);
     }
 }

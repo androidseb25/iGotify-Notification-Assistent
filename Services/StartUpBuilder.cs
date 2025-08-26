@@ -7,7 +7,6 @@ public class StartUpBuilder : IStartupFilter
         return builder =>
         {
             // Create GotifyInstance after starting of the API
-            
             var gss = GotifySocketService.getInstance();
             gss.Init();
             if (gss.isInit)

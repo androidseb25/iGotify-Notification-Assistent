@@ -16,12 +16,12 @@
         <PackageReference Include="Dapper" Version="2.1.66" />
         <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
         <PackageReference Include="Dapper.Mapper" Version="2.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.8" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="Scalar.AspNetCore" Version="2.0.18" />
+        <PackageReference Include="Scalar.AspNetCore" Version="2.7.0" />
         <PackageReference Include="secntfy.nuget" Version="1.0.5" />
-        <PackageReference Include="Websocket.Client" Version="5.1.2" />
+        <PackageReference Include="Websocket.Client" Version="5.2.0" />
     </ItemGroup>
 
 </Project>
