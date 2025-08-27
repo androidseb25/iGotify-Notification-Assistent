@@ -16,7 +16,7 @@
         <PackageReference Include="Dapper" Version="2.1.44" />
         <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
         <PackageReference Include="Dapper.Mapper" Version="2.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
         <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Scalar.AspNetCore" Version="1.2.75" />
