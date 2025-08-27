@@ -238,3 +238,6 @@ If you want to be a part of the translation team please create a issue:
 maybe you've been invited soon
 
 The link to the crowdin project: [https://de.crowdin.com/project/igotify](https://de.crowdin.com/project/igotify)
+
+## SecNtfy Status
+Here you can find the online status of the service [Status](https://ipv64.net/status/secntfy)
