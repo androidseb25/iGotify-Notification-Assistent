@@ -4,6 +4,9 @@ WORKDIR /app
 EXPOSE 5047
 EXPOSE 7221
 
+# Install curl in the final runtime image
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG TARGETARCH
 WORKDIR /src
@@ -23,6 +26,9 @@ RUN dotnet publish "./iGotify Notification Assist.csproj" -c Release -a $TARGETA
 # final stage/image
 FROM base AS final
 WORKDIR /app
+
+# Copy build output
 COPY --from=publish /app/publish .
+
 # USER $APP_UID
 ENTRYPOINT ["dotnet", "iGotify Notification Assist.dll"]

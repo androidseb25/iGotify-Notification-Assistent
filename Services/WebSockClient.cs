@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.WebSockets;
 using System.Reactive.Linq;
 using iGotify_Notification_Assist.Models;
@@ -9,17 +10,49 @@ namespace iGotify_Notification_Assist.Services;
 public class WebSockClient
 {
     public string? URL { get; init; }
-
+    public Users? user { get; init; }
     private WebsocketClient? ws;
+
+    private bool isStopped = false;
 
     public void Start(string clientToken, bool isRestart = false)
     {
+        isStopped = false;
         if (URL is { Length: 0 })
             throw new ApplicationException("URL is empty!");
+        if (user != null && user.Headers.Length > 0)
+        {
+            List<CustomHeaders>? customHeaders = JsonConvert.DeserializeObject<List<CustomHeaders>>(user.Headers);
+            if (customHeaders != null)
+            {
+                var factory = new Func<ClientWebSocket>(() =>
+                {
+                    var client = new ClientWebSocket();
+                    foreach (var header in customHeaders)
+                    {
+                        client.Options.SetRequestHeader(header.Key, header.Value);
+                    }
 
-        // Init WebSocket 
-        ws = new WebsocketClient(new Uri(URL!));
+                    return client;
+                });
+
+                // Init WebSocket 
+                ws = new WebsocketClient(new Uri(URL!), factory);
+            }
+            else
+            {
+                // Init WebSocket 
+                ws = new WebsocketClient(new Uri(URL!));
+            }
+        }
+        else
+        {
+            // Init WebSocket 
+            ws = new WebsocketClient(new Uri(URL!));
+        }
+
         ws.Name = clientToken;
+        ws.ReconnectTimeout = TimeSpan.FromSeconds(10);
         ws.IsReconnectionEnabled = false;
 
         ws.ReconnectionHappened.Subscribe(info =>
@@ -30,7 +63,7 @@ public class WebSockClient
                 Console.WriteLine($"Gotify with Clienttoken: \"{clientToken}\" is successfully reconnected!");
             }
         });
-        
+
         // When a disconnection happend try to reconnect the WebSocket
         ws.DisconnectionHappened.Subscribe(type =>
         {
@@ -40,11 +73,12 @@ public class WebSockClient
             {
                 case DisconnectionType.Lost:
                     Console.WriteLine("Connection lost reconnect to Websocket...");
-                    Stop();
+                    // Stop();
                     Start(wsName, true);
                     break;
                 case DisconnectionType.Error:
-                    Console.WriteLine("Webseocket Reconnection failed with Error. Try to reconnect in 10s.");
+                    Console.WriteLine(
+                        $"Webseocket Reconnection failed with Error. Try to reconnect ClientToken: {wsName} in 10s.");
                     ReconnectDelayed(wsName);
                     break;
                 case DisconnectionType.Exit:
@@ -57,9 +91,10 @@ public class WebSockClient
                     break;
             }
         });
-        
+
         // Listening to the WebSocket when message received
-        ws.MessageReceived.Select(msg => Observable.FromAsync(async () => {
+        ws.MessageReceived.Select(msg => Observable.FromAsync(async () =>
+            {
                 //Console.WriteLine($"Message received: {msg}");
                 // Convert the payload from gotify and replace values because so we can cast it better cast it to an object
                 var message = msg.ToString().Replace("client::display", "clientdisplay")
@@ -75,14 +110,16 @@ public class WebSockClient
                     Console.WriteLine("GotifyMessage is null");
                     return;
                 }
-                
+
                 // Go and send the message 
                 Console.WriteLine($"WS Instance from: {ws.Name}");
                 await new DeviceModel().SendNotifications(gm, ws);
             }))
             .Concat() // executes sequentially
             .Subscribe();
+
         ws.Start();
+
         if (!isRestart)
             Console.WriteLine("Done!");
     }
@@ -92,15 +129,17 @@ public class WebSockClient
     /// </summary>
     public async void Stop()
     {
-        await ws!.Stop(WebSocketCloseStatus.Empty, "Connection closing.");
+        if (ws != null)
+            await ws!.Stop(WebSocketCloseStatus.Empty, "Connection closing.");
         ws = null;
+        isStopped = true;
         await Task.Delay(1000);
     }
 
     private async void ReconnectDelayed(string clientToken)
     {
-        ws = null;
         await Task.Delay(10000);
-        Start(clientToken, true);
+        if (!isStopped)
+            Start(clientToken, true);
     }
 }
