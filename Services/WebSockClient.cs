@@ -30,6 +30,8 @@ public class WebSockClient
                     var client = new ClientWebSocket();
                     foreach (var header in customHeaders)
                     {
+                        if (header.Key == null || header.Value == null)
+                            continue;
                         client.Options.SetRequestHeader(header.Key, header.Value);
                     }
 

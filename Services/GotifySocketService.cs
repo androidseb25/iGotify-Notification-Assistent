@@ -37,7 +37,7 @@ public class GotifySocketService
         isInit = isDbFileExists;
     }
 
-    public static async void KillWsThread(string clientToken)
+    public static void KillWsThread(string clientToken)
     {
         if (_threadSockets != null)
         {
@@ -47,24 +47,24 @@ public class GotifySocketService
             try
             {
                 // 1) Signal termination
-                threadSocket.cts.Cancel();
+                threadSocket.cts?.Cancel();
 
                 // 2) If you have a WebSocket, close it actively so that blocking reads wake up
                 threadSocket.ws!.Stop();
 
                 // 3) Wait for thread end (short timeout so nothing hangs)
-                if (threadSocket.thread.IsAlive)
+                if (threadSocket.thread!.IsAlive)
                     threadSocket.thread.Join(millisecondsTimeout: 500);
             }
             finally
             {
-                threadSocket.cts.Dispose();
+                threadSocket.cts?.Dispose();
                 _threadSockets.Remove(threadSocket);
             }
         }
     }
 
-    public static async void KillAllWsThread()
+    public static void KillAllWsThread()
     {
         if (_threadSockets != null)
         {
@@ -73,13 +73,13 @@ public class GotifySocketService
                 try
                 {
                     // 1) Signal termination
-                    threadSocket.cts.Cancel();
+                    threadSocket.cts?.Cancel();
 
                     // 2) If you have a WebSocket, close it actively so that blocking reads wake up
                     threadSocket.ws!.Stop();
 
                     // 3) Wait for thread end (short timeout so nothing hangs)
-                    if (threadSocket.thread.IsAlive)
+                    if (threadSocket.thread!.IsAlive)
                         threadSocket.thread.Join(millisecondsTimeout: 500);
                 }
                 catch (Exception e)
@@ -88,7 +88,7 @@ public class GotifySocketService
                 }
                 finally
                 {
-                    threadSocket.cts.Dispose();
+                    threadSocket.cts?.Dispose();
                 }
             }
 
@@ -136,7 +136,7 @@ public class GotifySocketService
 
     private static void StartWsConn(ThreadSocket threadSocket, Users user)
     {
-        while (!threadSocket.cts.IsCancellationRequested)
+        while (!threadSocket.cts!.IsCancellationRequested)
         {
             try
             {
@@ -170,7 +170,7 @@ public class GotifySocketService
 
     private static void StartWsConn(ThreadSocket threadSocket, string gotifyServerUrl, string clientToken)
     {
-        while (!threadSocket.cts.IsCancellationRequested)
+        while (!threadSocket.cts!.IsCancellationRequested)
         {
             try
             {

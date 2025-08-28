@@ -25,7 +25,7 @@ public static class DatabaseService
 
         // Create a sample table
         const string createTableQuery =
-            "create table if not exists Users (Uid integer primary key, ClientToken text not null, DeviceToken text not null, Headers text not null);";
+            "create table if not exists Users (Uid integer primary key, ClientToken text not null, DeviceToken text not null, GotifyUrl text not null, Headers text not null);";
         dbConnection.Execute(createTableQuery);
 
         // Perform other database operations as needed
