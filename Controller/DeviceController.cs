@@ -40,8 +40,9 @@ public class DeviceController : ControllerBase
 
         if (await deviceModel.Insert())
         {
-            GotifySocketService.getInstance();
-            GotifySocketService.StartWsThread(deviceModel.GotifyUrl, deviceModel.ClientToken);
+            var gss = GotifySocketService.getInstance();
+            GotifySocketService.KillAllWsThread();
+            gss.Start();
             result = "Gerät erfolgreich hinzugefügt";
             resultBool = true;
         }
@@ -77,12 +78,9 @@ public class DeviceController : ControllerBase
         var usr = await DatabaseService.GetUser(token);
         if (await deviceModel.Delete())
         {
-            if (usr.Uid > 0)
-            {
-                GotifySocketService.getInstance();
-                GotifySocketService.KillWsThread(usr.ClientToken);
-            }
-
+            var gss = GotifySocketService.getInstance();
+            GotifySocketService.KillAllWsThread();
+            gss.Start();
             result = "Device deleted successfully!";
             resultBool = true;
         }
