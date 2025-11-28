@@ -1,7 +1,5 @@
 using iGotify_Notification_Assist.Services;
 using Microsoft.AspNetCore.Http.Json;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using Environments = iGotify_Notification_Assist.Services.Environments;
 
@@ -46,9 +44,9 @@ if (Environments.enableScalarUi)
     app.MapScalarApiReference(options =>
     {
         options.WithTitle("iGotify Notification Assist API")
-            .WithModels(false)
-            .WithLayout(ScalarLayout.Classic)
-            .WithTheme(ScalarTheme.Moon)
+            .HideModels()
+            .WithClassicLayout()
+            .WithTheme(ScalarTheme.Default)
             .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
     });
 }

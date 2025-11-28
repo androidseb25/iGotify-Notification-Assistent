@@ -1,5 +1,5 @@
 # See https://devblogs.microsoft.com/dotnet/improving-multiplatform-container-support/
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
 EXPOSE 5047
 EXPOSE 7221
@@ -7,7 +7,7 @@ EXPOSE 7221
 # Install curl in the final runtime image
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG TARGETARCH
 WORKDIR /src
 
