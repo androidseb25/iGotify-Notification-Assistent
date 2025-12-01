@@ -57,7 +57,8 @@ public class DeviceModel
         }
 
         var ntfy = new SecNtfy(Environments.secNtfyUrl);
-        _ = ntfy.SendNotification(usr.DeviceToken, title, msg, iGotifyMessage.priority == 10, imageUrl,
+        var response = await ntfy.SendNotification(usr.DeviceToken, title, msg, iGotifyMessage.priority == 10, imageUrl,
             iGotifyMessage.priority);
+        Console.WriteLine(response);
     }
 }

@@ -6,16 +6,15 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <InvariantGlobalization>true</InvariantGlobalization>
         <RootNamespace>iGotify_Notification_Assist</RootNamespace>
-        <AssemblyVersion>1.5.1.0</AssemblyVersion>
-        <FileVersion>1.5.1.0</FileVersion>
-        <Version>1.5.1.0</Version>
+        <AssemblyVersion>1.5.1.1</AssemblyVersion>
+        <FileVersion>1.5.1.1</FileVersion>
+        <Version>1.5.1.1</Version>
         <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Dapper" Version="2.1.66" />
         <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
-        <PackageReference Include="Dapper.Mapper" Version="2.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
         <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
