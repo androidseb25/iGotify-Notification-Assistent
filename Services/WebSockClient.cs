@@ -79,9 +79,18 @@ public class WebSockClient
                     Start(wsName, true);
                     break;
                 case DisconnectionType.Error:
-                    Console.WriteLine(
-                        $"Webseocket Reconnection failed with Error. Try to reconnect ClientToken: {wsName} in 10s.");
-                    ReconnectDelayed(wsName);
+                    if (type.Exception != null && type.Exception.Message.Contains("401"))
+                    {
+                        Console.WriteLine($"ClientToken: {wsName} is not authorized and returned a 401 Unauthorized error! Skipping reconnection...");
+                        Stop();
+                    }
+                    else
+                    {
+                        Console.WriteLine(
+                            $"Webseocket Reconnection failed with Error. Try to reconnect ClientToken: {wsName} in 10s.");
+                        ReconnectDelayed(wsName);
+                    }
+
                     break;
                 case DisconnectionType.Exit:
                     break;

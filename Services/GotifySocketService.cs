@@ -286,12 +286,25 @@ public class GotifySocketService
                     StartConnection(userList, secntfyUrl);
                     return;
                 }
-
-                isSecNtfyAvailable = SecNtfy.CheckIfUrlReachable(secntfyUrl) ? "yes" : "no";
             }
             catch
             {
                 Console.WriteLine($"Gotify Server: '{user.GotifyUrl}' is not available try to reconnect in 10s.");
+                StartDelayedConnection(userList, secntfyUrl);
+                return;
+            }
+            
+            try
+            {
+                bool isSecNtfyAvailableBool = SecNtfy.CheckIfUrlReachable(secntfyUrl);
+                isSecNtfyAvailable = isSecNtfyAvailableBool ? "yes" : "no";
+                
+                if (!isSecNtfyAvailableBool)
+                    Console.WriteLine($"SecNtfy Server: '{secntfyUrl}' is not available, please check your internet connection!");
+            }
+            catch
+            {
+                Console.WriteLine($"SecNtfy Server: '{secntfyUrl}' is not available try to reconnect in 10s.");
                 StartDelayedConnection(userList, secntfyUrl);
                 return;
             }
