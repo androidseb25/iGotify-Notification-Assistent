@@ -5,8 +5,8 @@ on:
     branches: [ main ]
     paths-ignore:
       - '*.md'
-      - '.github/**'
-      - '*.yaml'
+      #- '.github/**'
+      #- '*.yaml'
       - '*.png'
       - 'LICENSE'
 
