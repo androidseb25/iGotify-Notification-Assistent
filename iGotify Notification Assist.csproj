@@ -6,9 +6,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <InvariantGlobalization>true</InvariantGlobalization>
         <RootNamespace>iGotify_Notification_Assist</RootNamespace>
-        <AssemblyVersion>1.5.1.1</AssemblyVersion>
-        <FileVersion>1.5.1.1</FileVersion>
-        <Version>1.5.1.1</Version>
+        <AssemblyVersion>1.5.1.2</AssemblyVersion>
+        <FileVersion>1.5.1.2</FileVersion>
+        <Version>1.5.1.2</Version>
         <LangVersion>default</LangVersion>
     </PropertyGroup>
 
