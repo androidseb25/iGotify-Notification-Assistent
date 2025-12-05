@@ -149,6 +149,9 @@ public class WebSockClient
 
     private async void ReconnectDelayed(string clientToken)
     {
+        if (ws != null)
+            await ws!.Stop(WebSocketCloseStatus.Empty, "Connection closing.");
+        ws = null;
         await Task.Delay(10000);
         if (!isStopped)
             Start(clientToken, true);
