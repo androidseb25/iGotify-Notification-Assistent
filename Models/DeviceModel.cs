@@ -1,4 +1,5 @@
 using iGotify_Notification_Assist.Services;
+using Newtonsoft.Json;
 using SecNtfyNuGet;
 using Websocket.Client;
 using Environments = iGotify_Notification_Assist.Services.Environments;
@@ -59,6 +60,6 @@ public class DeviceModel
         var ntfy = new SecNtfy(Environments.secNtfyUrl);
         var response = await ntfy.SendNotification(usr.DeviceToken, title, msg, iGotifyMessage.priority == 10, imageUrl,
             iGotifyMessage.priority);
-        Console.WriteLine(response);
+        Console.WriteLine(response != null ? JsonConvert.SerializeObject(response) : "Notification response is null");
     }
 }
