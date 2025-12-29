@@ -261,7 +261,7 @@ public class GotifySocketService
             var statusNtfyList = secntfyTokenList.Count == 0 ? "empty" : "filled";
             Console.WriteLine($"SecNtfy Token list is: {statusNtfyList}");
             Console.WriteLine(
-                $"If one or more lists are empty please check the environment variable! GOTIFY_SERVERS or GOTIFY_CLIENTS or NTFY_TOKENS");
+                $"If one or more lists are empty please check the environment variable! GOTIFY_URLS or GOTIFY_CLIENT_TOKENS or SECNTFY_TOKENS");
             Console.WriteLine(
                 $"If all lists are empty do nothing, you will configure the gotify server over the iGotify app.");
         }
@@ -271,7 +271,7 @@ public class GotifySocketService
         StartConnection(userList, secntfyUrl);
     }
 
-    private void StartConnection(List<Users> userList, string secntfyUrl)
+    private async void StartConnection(List<Users> userList, string secntfyUrl)
     {
         foreach (var user in userList)
         {
@@ -279,7 +279,7 @@ public class GotifySocketService
             string isSecNtfyAvailable;
             try
             {
-                isGotifyAvailable = SecNtfy.CheckIfUrlReachable(user.GotifyUrl) ? "yes" : "no";
+                isGotifyAvailable = await SecNtfy.CheckIfUrlReachable(user.GotifyUrl) ? "yes" : "no";
 
                 if (isGotifyAvailable == "no")
                 {
@@ -296,7 +296,7 @@ public class GotifySocketService
             
             try
             {
-                bool isSecNtfyAvailableBool = SecNtfy.CheckIfUrlReachable(secntfyUrl);
+                bool isSecNtfyAvailableBool = await SecNtfy.CheckIfUrlReachable(secntfyUrl);
                 isSecNtfyAvailable = isSecNtfyAvailableBool ? "yes" : "no";
                 
                 if (!isSecNtfyAvailableBool)
