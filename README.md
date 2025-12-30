@@ -61,7 +61,9 @@ services:
   gotify:
     container_name: gotify
     hostname: gotify
-    image: gotify/server
+    image: gotify/server          # Uncommand correct server image
+    # image: gotify/server-arm7
+    # image: gotify/server-arm64
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -73,6 +75,12 @@ services:
       - data:/app/data
     environment:
       GOTIFY_DEFAULTUSER_PASS:  'my-very-strong-password'   # Change me!!!!!
+    healthcheck:
+      test: ["CMD-SHELL", "ls /app/data || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
 
   igotify:
     container_name: igotify
@@ -82,6 +90,9 @@ services:
     security_opt:
       - no-new-privileges:true
     pull_policy: always
+    depends_on:
+      gotify:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/Version" ]
       interval: "3s"
@@ -94,9 +105,11 @@ services:
     volumes:
       - api-data:/app/data
     #environment:                 # option environment see above note
-    #  GOTIFY_URLS:          ''
-    #  GOTIFY_CLIENT_TOKENS: ''
-    #  SECNTFY_TOKENS:       ''
+    # GOTIFY_URLS: ''
+    # GOTIFY_CLIENT_TOKENS: ''
+    # SECNTFY_TOKENS: ''
+    # ENABLE_CONSOLE_LOG: 'true'
+    # ENABLE_SCALAR_UI: 'true'
 
 networks:
   net:
@@ -131,15 +144,21 @@ services:
   gotify:
     container_name: gotify
     hostname: gotify
-    image: gotify/server
+    image: gotify/server          # Uncommand correct server image
+    # image: gotify/server-arm7
+    # image: gotify/server-arm64
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    networks:
+      - net
+    ports:
+      - "8680:80"
     volumes:
       - data:/app/data
     environment:
       GOTIFY_DEFAULTUSER_PASS:  'my-very-strong-password'   # Change me!!!!!
-      GOTIFY_REGISTRATION:       'false'
+      GOTIFY_REGISTRATION:      'false'
     labels:
       traefik.docker.network: proxy
       traefik.enable: "true"
@@ -152,31 +171,42 @@ services:
       traefik.http.routers.gotify.entrypoints: web
       traefik.http.routers.gotify.rule: Host(`gotify.domain-name.de`)
       traefik.http.services.gotify.loadbalancer.server.port: "80"
+    healthcheck:
+      test: ["CMD-SHELL", "ls /app/data || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
     networks:
       default: null
       proxy: null
 
-  igotify-notification: # (iGotify-Notification-Assistent)
+  igotify:
     container_name: igotify
     hostname: igotify
     image: ghcr.io/androidseb25/igotify-notification-assist:latest
-    restart: always
+    restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     pull_policy: always
+    depends_on:
+      gotify:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/Version" ]
       interval: "3s"
       timeout: "3s"
       retries: 5
+    networks:
+      - net
+    ports:
+      - "8681:8080"
     volumes:
-      - api-data:/app/data
-      
+      - api-data:/app/data      
     #environment:                 # option environment see above note
     #  GOTIFY_URLS:          ''
     #  GOTIFY_CLIENT_TOKENS: ''
-    #  SECNTFY_TOKENS:       ''
-    
+    #  SECNTFY_TOKENS:       ''    
     labels:
       traefik.docker.network: proxy
       traefik.enable: "true"
