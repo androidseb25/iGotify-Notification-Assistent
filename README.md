@@ -9,6 +9,7 @@ A small Gotify server notification assistent that decrypt the message and trigge
 Download Link to iGotify down below
 
 &nbsp;
+
 ## ⭐ Features
 
 * show received notifications with markdown
@@ -17,6 +18,7 @@ Download Link to iGotify down below
 * multiuser support
 
 &nbsp;
+
 ## 🔧 How to Install Gotify & iGotify-Notification-Assist
 
 ### 🐳 Docker `docker-compose.yaml`
@@ -30,6 +32,7 @@ Download Link to iGotify down below
 5. execute `docker compose up -d` to start the docker compose
 
 &nbsp;
+
 ### Needed environment variables
 
 * `GOTIFY_DEFAULTUSER_PASS` = the user password for the defaultuser
@@ -48,6 +51,7 @@ Download Link to iGotify down below
 *please write the boolean variables (true, false) in single quotes 'true'*
 
 #### All these configuration can be found after configure the app. It will display it for you
+
 #### Please note you can configure multiple instances of local gotify server by adding a semicolon `;` after each environment value e.g.:
 
 * `GOTIFY_URLS: 'http://gotify;http://gotify2;http://gotify3;...'`
@@ -56,12 +60,19 @@ Download Link to iGotify down below
 
 &nbsp;
 
-```bash
+### Docker Compose Konfigurationen
+
+<details>
+<summary><b>📦 Standard Docker Compose</b></summary>
+
+```yaml
 services:
   gotify:
     container_name: gotify
     hostname: gotify
-    image: gotify/server
+    image: gotify/server          # Uncommand correct server image
+    # image: gotify/server-arm7
+    # image: gotify/server-arm64
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -73,6 +84,12 @@ services:
       - data:/app/data
     environment:
       GOTIFY_DEFAULTUSER_PASS:  'my-very-strong-password'   # Change me!!!!!
+    healthcheck:
+      test: ["CMD-SHELL", "ls /app/data || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
 
   igotify:
     container_name: igotify
@@ -82,6 +99,9 @@ services:
     security_opt:
       - no-new-privileges:true
     pull_policy: always
+    depends_on:
+      gotify:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/Version" ]
       interval: "3s"
@@ -94,9 +114,11 @@ services:
     volumes:
       - api-data:/app/data
     #environment:                 # option environment see above note
-    #  GOTIFY_URLS:          ''
-    #  GOTIFY_CLIENT_TOKENS: ''
-    #  SECNTFY_TOKENS:       ''
+    # GOTIFY_URLS: ''
+    # GOTIFY_CLIENT_TOKENS: ''
+    # SECNTFY_TOKENS: ''
+    # ENABLE_CONSOLE_LOG: 'true'
+    # ENABLE_SCALAR_UI: 'true'
 
 networks:
   net:
@@ -105,41 +127,34 @@ volumes:
   data:
   api-data:
 ```
+
 *Thank you The_Think3r for the compose file and @herrpandora*
 
-&nbsp;
-### (Optional) NGINX Proxy Manager
+</details>
 
-When someone have problem's with incoming notifications on the app, please try this options under Advance Settings for the setuped proxies
+<details>
+<summary><b>🔀 Traefik Config</b></summary>
 
-```bash
-proxy_set_header   Host $http_host;
-proxy_connect_timeout   1m;
-proxy_send_timeout      1m;
-proxy_read_timeout      1m;
-```
-
-Also **don't** check the boxes which say "HTTP/2 Support" and "HSTS enabled".
-
-*Thank you to @TBT-TBT for sharing this notice*
-
-&nbsp;
-### Traefik Config
-
-```bash
+```yaml
 services:
   gotify:
     container_name: gotify
     hostname: gotify
-    image: gotify/server
+    image: gotify/server          # Uncommand correct server image
+    # image: gotify/server-arm7
+    # image: gotify/server-arm64
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    networks:
+      - net
+    ports:
+      - "8680:80"
     volumes:
       - data:/app/data
     environment:
       GOTIFY_DEFAULTUSER_PASS:  'my-very-strong-password'   # Change me!!!!!
-      GOTIFY_REGISTRATION:       'false'
+      GOTIFY_REGISTRATION:      'false'
     labels:
       traefik.docker.network: proxy
       traefik.enable: "true"
@@ -152,31 +167,42 @@ services:
       traefik.http.routers.gotify.entrypoints: web
       traefik.http.routers.gotify.rule: Host(`gotify.domain-name.de`)
       traefik.http.services.gotify.loadbalancer.server.port: "80"
+    healthcheck:
+      test: ["CMD-SHELL", "ls /app/data || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
     networks:
       default: null
       proxy: null
 
-  igotify-notification: # (iGotify-Notification-Assistent)
+  igotify:
     container_name: igotify
     hostname: igotify
     image: ghcr.io/androidseb25/igotify-notification-assist:latest
-    restart: always
+    restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     pull_policy: always
+    depends_on:
+      gotify:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/Version" ]
       interval: "3s"
       timeout: "3s"
       retries: 5
+    networks:
+      - net
+    ports:
+      - "8681:8080"
     volumes:
-      - api-data:/app/data
-      
+      - api-data:/app/data      
     #environment:                 # option environment see above note
     #  GOTIFY_URLS:          ''
     #  GOTIFY_CLIENT_TOKENS: ''
-    #  SECNTFY_TOKENS:       ''
-    
+    #  SECNTFY_TOKENS:       ''    
     labels:
       traefik.docker.network: proxy
       traefik.enable: "true"
@@ -201,9 +227,30 @@ volumes:
   data:
   api-data:
 ```
+
 *Thank you to @majo1989 for sharing this config*
 
+</details>
+
 &nbsp;
+
+### (Optional) NGINX Proxy Manager
+
+When someone have problem's with incoming notifications on the app, please try this options under Advance Settings for the setuped proxies
+
+```bash
+proxy_set_header   Host $http_host;
+proxy_connect_timeout   1m;
+proxy_send_timeout      1m;
+proxy_read_timeout      1m;
+```
+
+Also **don't** check the boxes which say "HTTP/2 Support" and "HSTS enabled".
+
+*Thank you to @TBT-TBT for sharing this notice*
+
+&nbsp;
+
 ## 🔧 Install iGotify app
 
 Download from [AppStore](https://apps.apple.com/de/app/igotify/id6473452512?itsct=apps_box_badge&amp;itscg=30200)
@@ -228,6 +275,7 @@ And if everythink is ok, you're logged in 🎉
 Now you receive background notifications when Gotify receives a message.
 
 ## Translation
+
 If you want to be a part of the translation team please create a issue:
 
 **Title: Translation: *language***
@@ -239,4 +287,5 @@ maybe you've been invited soon
 The link to the crowdin project: [https://de.crowdin.com/project/igotify](https://de.crowdin.com/project/igotify)
 
 ## SecNtfy Status
+
 Here you can find the online status of the service [Status](https://ipv64.net/status/secntfy)

@@ -16,6 +16,12 @@ services:
       - data:/app/data
     environment:
       GOTIFY_DEFAULTUSER_PASS:  'my-very-strong-password'   # Change me!!!!!
+    healthcheck:
+      test: ["CMD-SHELL", "ls /app/data || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
 
   igotify:
     container_name: igotify
@@ -25,6 +31,9 @@ services:
     security_opt:
       - no-new-privileges:true
     pull_policy: always
+    depends_on:
+      gotify:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/Version" ]
       interval: "3s"
