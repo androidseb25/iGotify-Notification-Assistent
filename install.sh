@@ -101,11 +101,83 @@ detect_distro() {
   if [ -f /etc/os-release ]; then
     . /etc/os-release
     DISTRO=$ID
+    DISTRO_VERSION=$VERSION_ID
   elif [ -f /etc/alpine-release ]; then
     DISTRO="alpine"
+    DISTRO_VERSION=$(cat /etc/alpine-release)
   else
     DISTRO="unknown"
+    DISTRO_VERSION="unknown"
   fi
+}
+
+# Check GLIBC compatibility for .NET (called very early, before dialog install)
+check_glibc_early() {
+  # Skip check on Alpine (uses musl, not glibc)
+  if [ -f /etc/alpine-release ]; then
+    return 0
+  fi
+
+  # Get GLIBC version
+  GLIBC_VERSION=$(ldd --version 2>&1 | head -1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
+
+  if [ -z "$GLIBC_VERSION" ]; then
+    # Try alternative method
+    GLIBC_VERSION=$(getconf GNU_LIBC_VERSION 2>/dev/null | awk '{print $2}')
+  fi
+
+  if [ -z "$GLIBC_VERSION" ]; then
+    # Can't determine version, let it proceed
+    return 0
+  fi
+
+  # Extract major and minor version
+  GLIBC_MAJOR=$(echo "$GLIBC_VERSION" | cut -d. -f1)
+  GLIBC_MINOR=$(echo "$GLIBC_VERSION" | cut -d. -f2)
+
+  # .NET 10.0 requires GLIBC 2.34+
+  REQUIRED_MAJOR=2
+  REQUIRED_MINOR=34
+
+  # Compare versions
+  if [ "$GLIBC_MAJOR" -lt "$REQUIRED_MAJOR" ] 2>/dev/null || \
+     { [ "$GLIBC_MAJOR" -eq "$REQUIRED_MAJOR" ] && [ "$GLIBC_MINOR" -lt "$REQUIRED_MINOR" ]; } 2>/dev/null; then
+
+    # Detect distro for helpful message
+    if [ -f /etc/os-release ]; then
+      . /etc/os-release
+      DISTRO_NAME="$NAME $VERSION_ID"
+    else
+      DISTRO_NAME="Your system"
+    fi
+
+    echo ""
+    echo -e "${RED}============================================${NC}"
+    echo -e "${RED}         UNSUPPORTED SYSTEM${NC}"
+    echo -e "${RED}============================================${NC}"
+    echo ""
+    echo -e "${YELLOW}$DISTRO_NAME is not supported.${NC}"
+    echo ""
+    echo -e "Your GLIBC version: ${RED}$GLIBC_VERSION${NC}"
+    echo -e "Required:           ${GREEN}2.34 or newer${NC}"
+    echo ""
+    echo ".NET 10.0 requires GLIBC 2.34+ which is"
+    echo "typically available in:"
+    echo "  - Debian 12 (Bookworm) or newer"
+    echo "  - Ubuntu 22.04 or newer"
+    echo "  - Fedora 35 or newer"
+    echo "  - RHEL/AlmaLinux/Rocky 9 or newer"
+    echo ""
+    echo -e "${YELLOW}Please upgrade your operating system.${NC}"
+    echo ""
+    echo -e "${GREEN}Alternative: Use Docker${NC}"
+    echo "If you must stay on this OS, you can use Docker instead."
+    echo "See: https://github.com/androidseb25/iGotify-Notification-Assistent/wiki#docker"
+    echo ""
+    exit 1
+  fi
+
+  return 0
 }
 
 # Detect init system
@@ -151,17 +223,48 @@ install_deps() {
 install_dotnet() {
   export DOTNET_ROOT=/opt/dotnet
   mkdir -p $DOTNET_ROOT
-  curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -c 10.0 --install-dir $DOTNET_ROOT
-  ln -sf $DOTNET_ROOT/dotnet /usr/local/bin/dotnet
+  curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -c 10.0 --runtime aspnetcore --install-dir $DOTNET_ROOT
+  # Create symlink - prefer /usr/local/bin if in PATH, fallback to /usr/bin
+  if echo "$PATH" | tr ':' '\n' | grep -qx "/usr/local/bin"; then
+    ln -sf $DOTNET_ROOT/dotnet /usr/local/bin/dotnet
+  else
+    ln -sf $DOTNET_ROOT/dotnet /usr/bin/dotnet
+  fi
+}
+
+# Detect system architecture
+detect_arch() {
+  MACHINE=$(uname -m)
+  case $MACHINE in
+    x86_64)
+      ARCH="amd64"
+      ;;
+    aarch64|arm64)
+      ARCH="arm64"
+      ;;
+    armv7l|armhf)
+      ARCH="arm"
+      ;;
+    *)
+      ARCH=""
+      ;;
+  esac
 }
 
 # Download and install iGotify
 install_igotify() {
+  detect_arch
+
+  if [ -z "$ARCH" ]; then
+    dlg --backtitle "$BACKTITLE" --title "Error" --msgbox "\nUnsupported architecture: $(uname -m)\n\nSupported: amd64, arm64, arm" 9 50
+    return 1
+  fi
+
   RELEASE=$(curl -s https://api.github.com/repos/androidseb25/iGotify-Notification-Assistent/releases/latest | grep "tag_name" | awk '{print substr($2, 3, length($2)-4) }')
 
   cd /tmp
   rm -f igotify.zip
-  curl -sSL -o igotify.zip "https://github.com/androidseb25/iGotify-Notification-Assistent/releases/download/v${RELEASE}/iGotify-Notification-Service-amd64-v${RELEASE}.zip"
+  curl -sSL -o igotify.zip "https://github.com/androidseb25/iGotify-Notification-Assistent/releases/download/v${RELEASE}/iGotify-Notification-Service-${ARCH}-v${RELEASE}.zip"
 
   [ -d /opt/iGotify ] && rm -rf /opt/iGotify
   mkdir -p /opt/iGotify
@@ -245,7 +348,6 @@ get_latest_version() {
 
 # Progress bar installation
 do_install() {
-  detect_distro
   detect_init
 
   (
@@ -375,7 +477,7 @@ do_uninstall() {
       echo "Removing .NET runtime..."
       echo "XXX"
       rm -rf /opt/dotnet
-      rm -f /usr/local/bin/dotnet
+      rm -f /usr/bin/dotnet /usr/local/bin/dotnet
       sleep 1
       echo "100"
       echo "XXX"
@@ -486,7 +588,12 @@ do_status() {
 
   # Check if .NET is installed
   if [ -f /opt/dotnet/dotnet ]; then
-    DOTNET_VERSION=$(/opt/dotnet/dotnet --version 2>/dev/null || echo "unknown")
+    # Try --version first (works with SDK), fallback to --info (runtime only)
+    DOTNET_VERSION=$(/opt/dotnet/dotnet --version 2>/dev/null)
+    if [ -z "$DOTNET_VERSION" ] || echo "$DOTNET_VERSION" | grep -q "could not be loaded"; then
+      DOTNET_VERSION=$(/opt/dotnet/dotnet --info 2>/dev/null | grep "Version:" | head -1 | awk '{print $2}')
+    fi
+    [ -z "$DOTNET_VERSION" ] && DOTNET_VERSION="unknown"
     DOTNET_ICON="\\Z2✓\\Zn"
   else
     DOTNET_VERSION="not installed"
@@ -591,6 +698,7 @@ main_menu() {
 
 # Main entry point
 check_root
+check_glibc_early
 ensure_dialog
 setup_dialog_theme
 main_menu
