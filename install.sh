@@ -111,26 +111,67 @@ detect_distro() {
   fi
 }
 
-# Check GLIBC compatibility for .NET
-check_glibc_compat() {
-  detect_distro
+# Check GLIBC compatibility for .NET (called very early, before dialog install)
+check_glibc_early() {
+  # Skip check on Alpine (uses musl, not glibc)
+  if [ -f /etc/alpine-release ]; then
+    return 0
+  fi
 
-  case $DISTRO in
-    debian|raspbian)
-      if [ -n "$DISTRO_VERSION" ] && [ "$DISTRO_VERSION" -lt 12 ] 2>/dev/null; then
-        dlg --backtitle "$BACKTITLE" --title "Incompatible System" --msgbox "\nDebian/Raspbian $DISTRO_VERSION is not supported.\n\n.NET 10.0 requires GLIBC 2.34+ which is only\navailable in Debian 12 (Bookworm) or newer.\n\nPlease upgrade your system to Debian 12." 12 55
-        return 1
-      fi
-      ;;
-    ubuntu)
-      # Ubuntu 22.04+ has GLIBC 2.35+
-      UBUNTU_MAJOR=$(echo "$DISTRO_VERSION" | cut -d. -f1)
-      if [ -n "$UBUNTU_MAJOR" ] && [ "$UBUNTU_MAJOR" -lt 22 ] 2>/dev/null; then
-        dlg --backtitle "$BACKTITLE" --title "Incompatible System" --msgbox "\nUbuntu $DISTRO_VERSION is not supported.\n\n.NET 10.0 requires GLIBC 2.34+ which is only\navailable in Ubuntu 22.04 or newer.\n\nPlease upgrade your system." 12 55
-        return 1
-      fi
-      ;;
-  esac
+  # Get GLIBC version
+  GLIBC_VERSION=$(ldd --version 2>&1 | head -1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
+
+  if [ -z "$GLIBC_VERSION" ]; then
+    # Try alternative method
+    GLIBC_VERSION=$(getconf GNU_LIBC_VERSION 2>/dev/null | awk '{print $2}')
+  fi
+
+  if [ -z "$GLIBC_VERSION" ]; then
+    # Can't determine version, let it proceed
+    return 0
+  fi
+
+  # Extract major and minor version
+  GLIBC_MAJOR=$(echo "$GLIBC_VERSION" | cut -d. -f1)
+  GLIBC_MINOR=$(echo "$GLIBC_VERSION" | cut -d. -f2)
+
+  # .NET 10.0 requires GLIBC 2.34+
+  REQUIRED_MAJOR=2
+  REQUIRED_MINOR=34
+
+  # Compare versions
+  if [ "$GLIBC_MAJOR" -lt "$REQUIRED_MAJOR" ] 2>/dev/null || \
+     { [ "$GLIBC_MAJOR" -eq "$REQUIRED_MAJOR" ] && [ "$GLIBC_MINOR" -lt "$REQUIRED_MINOR" ]; } 2>/dev/null; then
+
+    # Detect distro for helpful message
+    if [ -f /etc/os-release ]; then
+      . /etc/os-release
+      DISTRO_NAME="$NAME $VERSION_ID"
+    else
+      DISTRO_NAME="Your system"
+    fi
+
+    echo ""
+    echo -e "${RED}============================================${NC}"
+    echo -e "${RED}         UNSUPPORTED SYSTEM${NC}"
+    echo -e "${RED}============================================${NC}"
+    echo ""
+    echo -e "${YELLOW}$DISTRO_NAME is not supported.${NC}"
+    echo ""
+    echo -e "Your GLIBC version: ${RED}$GLIBC_VERSION${NC}"
+    echo -e "Required:           ${GREEN}2.34 or newer${NC}"
+    echo ""
+    echo ".NET 10.0 requires GLIBC 2.34+ which is"
+    echo "typically available in:"
+    echo "  - Debian 12 (Bookworm) or newer"
+    echo "  - Ubuntu 22.04 or newer"
+    echo "  - Fedora 35 or newer"
+    echo "  - RHEL/AlmaLinux/Rocky 9 or newer"
+    echo ""
+    echo -e "${YELLOW}Please upgrade your operating system.${NC}"
+    echo ""
+    exit 1
+  fi
 
   return 0
 }
@@ -303,11 +344,6 @@ get_latest_version() {
 
 # Progress bar installation
 do_install() {
-  # Check GLIBC compatibility before starting
-  if ! check_glibc_compat; then
-    return 1
-  fi
-
   detect_init
 
   (
@@ -653,6 +689,7 @@ main_menu() {
 
 # Main entry point
 check_root
+check_glibc_early
 ensure_dialog
 setup_dialog_theme
 main_menu
