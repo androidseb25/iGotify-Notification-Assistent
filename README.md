@@ -66,7 +66,7 @@ For detailed documentation, visit the **[Wiki](https://github.com/androidseb25/i
 
 or 
 
-[AppStore Link](https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250&releaseDate=1702425600)](https://apps.apple.com/app/igotify/id6473452512)
+[AppStore Link](https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250&releaseDate=1702425600)
 
 ## Bugs & Feedback
 
