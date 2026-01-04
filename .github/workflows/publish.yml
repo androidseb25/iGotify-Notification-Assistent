@@ -9,6 +9,7 @@ on:
       - '*.yaml'
       - '*.png'
       - 'LICENSE'
+      - 'install.sh'
 
 jobs:
   build_arm64_images:
