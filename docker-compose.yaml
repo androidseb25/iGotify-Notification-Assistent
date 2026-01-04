@@ -1,21 +1,53 @@
+# iGotify Notification Assistant - Docker Compose
+#
+# Quick Start:
+#   1. Copy .env.example to .env and configure
+#   2. Run: docker compose up -d
+#
+# Documentation: https://github.com/androidseb25/iGotify-Notification-Assistent/wiki
+
 services:
   gotify:
     container_name: gotify
     hostname: gotify
-    image: gotify/server          # Uncommand correct server image
-    # image: gotify/server-arm7
-    # image: gotify/server-arm64
+    image: gotify/server
+    # image: gotify/server-arm7   # For ARM v7
+    # image: gotify/server-arm64  # For ARM64
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     networks:
       - net
+      # - proxy  # Uncomment for Traefik
     ports:
       - "8680:80"
     volumes:
       - data:/app/data
     environment:
-      GOTIFY_DEFAULTUSER_PASS:  'my-very-strong-password'   # Change me!!!!!
+      GOTIFY_DEFAULTUSER_PASS: ${GOTIFY_DEFAULTUSER_PASS:?Please set GOTIFY_DEFAULTUSER_PASS in .env}
+      # GOTIFY_REGISTRATION: 'false'  # Disable user registration
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    # ─── Traefik Labels (uncomment to enable) ───────────────────────
+    # labels:
+    #   traefik.enable: "true"
+    #   traefik.docker.network: proxy
+    #   # HTTPS
+    #   traefik.http.routers.gotify-secure.entrypoints: websecure
+    #   traefik.http.routers.gotify-secure.rule: Host(`gotify.example.com`)
+    #   traefik.http.routers.gotify-secure.tls: "true"
+    #   traefik.http.routers.gotify-secure.tls.certresolver: http_resolver
+    #   traefik.http.routers.gotify-secure.service: gotify
+    #   traefik.http.routers.gotify-secure.middlewares: default@file
+    #   # HTTP (redirect to HTTPS)
+    #   traefik.http.routers.gotify.entrypoints: web
+    #   traefik.http.routers.gotify.rule: Host(`gotify.example.com`)
+    #   # Service
+    #   traefik.http.services.gotify.loadbalancer.server.port: "80"
 
   igotify:
     container_name: igotify
@@ -24,27 +56,52 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    pull_policy: always
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/Version" ]
-      interval: "3s"
-      timeout: "3s"
-      retries: 5
+    depends_on:
+      gotify:
+        condition: service_healthy
     networks:
       - net
+      # - proxy  # Uncomment for Traefik
     ports:
       - "8681:8080"
     volumes:
       - api-data:/app/data
-    #environment:                 # option environment see above note
-    # GOTIFY_URLS: ''
-    # GOTIFY_CLIENT_TOKENS: ''
-    # SECNTFY_TOKENS: ''
-    # ENABLE_CONSOLE_LOG: 'true'
-    # ENABLE_SCALAR_UI: 'true'
+    environment:
+      # Required only when NOT using a public domain
+      # See wiki for details: https://github.com/androidseb25/iGotify-Notification-Assistent/wiki#environment-variables
+      GOTIFY_URLS: ${GOTIFY_URLS:-}
+      GOTIFY_CLIENT_TOKENS: ${GOTIFY_CLIENT_TOKENS:-}
+      SECNTFY_TOKENS: ${SECNTFY_TOKENS:-}
+      # Optional settings
+      ENABLE_CONSOLE_LOG: ${ENABLE_CONSOLE_LOG:-'true'}
+      ENABLE_SCALAR_UI: ${ENABLE_SCALAR_UI:-'true'}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/Version"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    # ─── Traefik Labels (uncomment to enable) ───────────────────────
+    # labels:
+    #   traefik.enable: "true"
+    #   traefik.docker.network: proxy
+    #   # HTTPS
+    #   traefik.http.routers.igotify-secure.entrypoints: websecure
+    #   traefik.http.routers.igotify-secure.rule: Host(`igotify.example.com`)
+    #   traefik.http.routers.igotify-secure.tls: "true"
+    #   traefik.http.routers.igotify-secure.tls.certresolver: http_resolver
+    #   traefik.http.routers.igotify-secure.service: igotify
+    #   traefik.http.routers.igotify-secure.middlewares: default@file
+    #   # HTTP (redirect to HTTPS)
+    #   traefik.http.routers.igotify.entrypoints: web
+    #   traefik.http.routers.igotify.rule: Host(`igotify.example.com`)
+    #   # Service
+    #   traefik.http.services.igotify.loadbalancer.server.port: "8080"
 
 networks:
   net:
+  # proxy:
+  #   external: true
 
 volumes:
   data:
