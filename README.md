@@ -57,6 +57,7 @@ For detailed documentation, visit the **[Wiki](https://github.com/androidseb25/i
 - [Docker Installation](https://github.com/androidseb25/iGotify-Notification-Assistent/wiki#docker) - Full Docker setup with environment variables
 - [Linux Service](https://github.com/androidseb25/iGotify-Notification-Assistent/wiki#linux-service) - Native installation guide
 - [Reverse Proxy](https://github.com/androidseb25/iGotify-Notification-Assistent/wiki#reverse-proxy) - NGINX Proxy Manager configuration
+- [First Start](https://github.com/androidseb25/iGotify-Notification-Assistent/wiki#first-start) - First Start guide
 - [Roadmap](https://github.com/androidseb25/iGotify-Notification-Assistent/wiki#roadmap) - Planned features
 
 ## iOS App
