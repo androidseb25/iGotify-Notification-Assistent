@@ -101,11 +101,38 @@ detect_distro() {
   if [ -f /etc/os-release ]; then
     . /etc/os-release
     DISTRO=$ID
+    DISTRO_VERSION=$VERSION_ID
   elif [ -f /etc/alpine-release ]; then
     DISTRO="alpine"
+    DISTRO_VERSION=$(cat /etc/alpine-release)
   else
     DISTRO="unknown"
+    DISTRO_VERSION="unknown"
   fi
+}
+
+# Check GLIBC compatibility for .NET
+check_glibc_compat() {
+  detect_distro
+
+  case $DISTRO in
+    debian|raspbian)
+      if [ -n "$DISTRO_VERSION" ] && [ "$DISTRO_VERSION" -lt 12 ] 2>/dev/null; then
+        dlg --backtitle "$BACKTITLE" --title "Incompatible System" --msgbox "\nDebian/Raspbian $DISTRO_VERSION is not supported.\n\n.NET 10.0 requires GLIBC 2.34+ which is only\navailable in Debian 12 (Bookworm) or newer.\n\nPlease upgrade your system to Debian 12." 12 55
+        return 1
+      fi
+      ;;
+    ubuntu)
+      # Ubuntu 22.04+ has GLIBC 2.35+
+      UBUNTU_MAJOR=$(echo "$DISTRO_VERSION" | cut -d. -f1)
+      if [ -n "$UBUNTU_MAJOR" ] && [ "$UBUNTU_MAJOR" -lt 22 ] 2>/dev/null; then
+        dlg --backtitle "$BACKTITLE" --title "Incompatible System" --msgbox "\nUbuntu $DISTRO_VERSION is not supported.\n\n.NET 10.0 requires GLIBC 2.34+ which is only\navailable in Ubuntu 22.04 or newer.\n\nPlease upgrade your system." 12 55
+        return 1
+      fi
+      ;;
+  esac
+
+  return 0
 }
 
 # Detect init system
@@ -151,17 +178,48 @@ install_deps() {
 install_dotnet() {
   export DOTNET_ROOT=/opt/dotnet
   mkdir -p $DOTNET_ROOT
-  curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -c 10.0 --install-dir $DOTNET_ROOT
-  ln -sf $DOTNET_ROOT/dotnet /usr/local/bin/dotnet
+  curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -c 10.0 --runtime aspnetcore --install-dir $DOTNET_ROOT
+  # Create symlink - prefer /usr/local/bin if in PATH, fallback to /usr/bin
+  if echo "$PATH" | tr ':' '\n' | grep -qx "/usr/local/bin"; then
+    ln -sf $DOTNET_ROOT/dotnet /usr/local/bin/dotnet
+  else
+    ln -sf $DOTNET_ROOT/dotnet /usr/bin/dotnet
+  fi
+}
+
+# Detect system architecture
+detect_arch() {
+  MACHINE=$(uname -m)
+  case $MACHINE in
+    x86_64)
+      ARCH="amd64"
+      ;;
+    aarch64|arm64)
+      ARCH="arm64"
+      ;;
+    armv7l|armhf)
+      ARCH="arm"
+      ;;
+    *)
+      ARCH=""
+      ;;
+  esac
 }
 
 # Download and install iGotify
 install_igotify() {
+  detect_arch
+
+  if [ -z "$ARCH" ]; then
+    dlg --backtitle "$BACKTITLE" --title "Error" --msgbox "\nUnsupported architecture: $(uname -m)\n\nSupported: amd64, arm64, arm" 9 50
+    return 1
+  fi
+
   RELEASE=$(curl -s https://api.github.com/repos/androidseb25/iGotify-Notification-Assistent/releases/latest | grep "tag_name" | awk '{print substr($2, 3, length($2)-4) }')
 
   cd /tmp
   rm -f igotify.zip
-  curl -sSL -o igotify.zip "https://github.com/androidseb25/iGotify-Notification-Assistent/releases/download/v${RELEASE}/iGotify-Notification-Service-amd64-v${RELEASE}.zip"
+  curl -sSL -o igotify.zip "https://github.com/androidseb25/iGotify-Notification-Assistent/releases/download/v${RELEASE}/iGotify-Notification-Service-${ARCH}-v${RELEASE}.zip"
 
   [ -d /opt/iGotify ] && rm -rf /opt/iGotify
   mkdir -p /opt/iGotify
@@ -245,7 +303,11 @@ get_latest_version() {
 
 # Progress bar installation
 do_install() {
-  detect_distro
+  # Check GLIBC compatibility before starting
+  if ! check_glibc_compat; then
+    return 1
+  fi
+
   detect_init
 
   (
@@ -375,7 +437,7 @@ do_uninstall() {
       echo "Removing .NET runtime..."
       echo "XXX"
       rm -rf /opt/dotnet
-      rm -f /usr/local/bin/dotnet
+      rm -f /usr/bin/dotnet /usr/local/bin/dotnet
       sleep 1
       echo "100"
       echo "XXX"
