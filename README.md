@@ -64,6 +64,10 @@ For detailed documentation, visit the **[Wiki](https://github.com/androidseb25/i
 
 [![Download on the App Store](https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250&releaseDate=1702425600)](https://apps.apple.com/app/igotify/id6473452512)
 
+or 
+
+[AppStore Link](https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250&releaseDate=1702425600)](https://apps.apple.com/app/igotify/id6473452512)
+
 ## Bugs & Feedback
 
 For bugs or feedback please send me a PM in Discord under the name [**sebakaderangler**](https://discord.com/users/432049343802114048) or fill out the [issue form](https://github.com/androidseb25/iGotify-Notification-Assistent/issues) here on GitHub.
