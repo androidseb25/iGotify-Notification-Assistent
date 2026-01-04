@@ -39,7 +39,7 @@ docker compose up -d
 ### Option 2: Linux Service
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/androidseb25/iGotify-Notification-Assistent/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/androidseb25/iGotify-Notification-Assistent/main/install.sh | sudo bash
 ```
 
 ### Default Ports
