@@ -588,7 +588,12 @@ do_status() {
 
   # Check if .NET is installed
   if [ -f /opt/dotnet/dotnet ]; then
-    DOTNET_VERSION=$(/opt/dotnet/dotnet --version 2>/dev/null || echo "unknown")
+    # Try --version first (works with SDK), fallback to --info (runtime only)
+    DOTNET_VERSION=$(/opt/dotnet/dotnet --version 2>/dev/null)
+    if [ -z "$DOTNET_VERSION" ] || echo "$DOTNET_VERSION" | grep -q "could not be loaded"; then
+      DOTNET_VERSION=$(/opt/dotnet/dotnet --info 2>/dev/null | grep "Version:" | head -1 | awk '{print $2}')
+    fi
+    [ -z "$DOTNET_VERSION" ] && DOTNET_VERSION="unknown"
     DOTNET_ICON="\\Z2✓\\Zn"
   else
     DOTNET_VERSION="not installed"
