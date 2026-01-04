@@ -170,6 +170,10 @@ check_glibc_early() {
     echo ""
     echo -e "${YELLOW}Please upgrade your operating system.${NC}"
     echo ""
+    echo -e "${GREEN}Alternative: Use Docker${NC}"
+    echo "If you must stay on this OS, you can use Docker instead."
+    echo "See: https://github.com/androidseb25/iGotify-Notification-Assistent/wiki#docker"
+    echo ""
     exit 1
   fi
 
