@@ -1,5 +1,6 @@
 using System.Net.Sockets;
 using System.Net.WebSockets;
+using System.Collections.Concurrent;
 using iGotify_Notification_Assist.Models;
 using SecNtfyNuGet;
 
@@ -13,6 +14,14 @@ public class GotifySocketService
 
     // Data structure for tracking threads and WebSocket connections
     private static List<ThreadSocket>? _threadSockets;
+    private static readonly ConcurrentDictionary<string, NativeSocketRuntime> _nativeSockets = new();
+
+    private sealed class NativeSocketRuntime
+    {
+        public required CancellationTokenSource Cts { get; init; }
+        public required Task RunnerTask { get; init; }
+        public required WebSockClientNative Client { get; init; }
+    }
 
     public static GotifySocketService getInstance()
     {
@@ -62,6 +71,8 @@ public class GotifySocketService
                 _threadSockets.Remove(threadSocket);
             }
         }
+
+        StopNativeSocket(clientToken);
     }
 
     public static void KillAllWsThread()
@@ -93,6 +104,11 @@ public class GotifySocketService
             }
 
             _threadSockets.Clear();
+        }
+
+        foreach (var clientToken in _nativeSockets.Keys)
+        {
+            StopNativeSocket(clientToken);
         }
     }
 
@@ -132,6 +148,30 @@ public class GotifySocketService
         }
         else
             Console.WriteLine($"Client: {user.ClientToken} already connected! Skipping...");
+    }
+
+    public static void StartNativeWsTask(Users user)
+    {
+        if (_nativeSockets.ContainsKey(user.ClientToken))
+        {
+            Console.WriteLine($"Client: {user.ClientToken} already connected (native)! Skipping...");
+            return;
+        }
+
+        var cts = new CancellationTokenSource();
+        var nativeClient = new WebSockClientNative();
+        var task = Task.Run(() => nativeClient.RunAsync(user, cts.Token), cts.Token);
+
+        if (!_nativeSockets.TryAdd(user.ClientToken, new NativeSocketRuntime
+            {
+                Cts = cts,
+                RunnerTask = task,
+                Client = nativeClient
+            }))
+        {
+            cts.Cancel();
+            cts.Dispose();
+        }
     }
 
     private static void StartWsConn(ThreadSocket threadSocket, Users user)
@@ -315,7 +355,8 @@ public class GotifySocketService
             Console.WriteLine($"Is SecNtfy Server - Url available: {isSecNtfyAvailable}");
             Console.WriteLine($"Client - Token: {user.ClientToken}");
 
-            StartWsThread(user);
+            // StartWsThread(user); // legacy websocket.client implementation
+            StartNativeWsTask(user);
         }
     }
 
@@ -324,5 +365,26 @@ public class GotifySocketService
         await Task.Delay(10000);
         Console.WriteLine("Reconnecting...");
         StartConnection(userList, secntfyUrl);
+    }
+
+    private static void StopNativeSocket(string clientToken)
+    {
+        if (!_nativeSockets.TryRemove(clientToken, out var runtime))
+            return;
+
+        try
+        {
+            runtime.Cts.Cancel();
+            runtime.Client.StopAsync().GetAwaiter().GetResult();
+            runtime.RunnerTask.Wait(millisecondsTimeout: 500);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        finally
+        {
+            runtime.Cts.Dispose();
+        }
     }
 }

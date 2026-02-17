@@ -40,17 +40,31 @@ public class DeviceModel
     /// <param name="clientToken"></param>
     public async Task SendNotifications(GotifyMessage iGotifyMessage, WebsocketClient webSock)
     {
+        await SendNotifications(iGotifyMessage, webSock.Url.ToString(), webSock.Name ?? "");
+    }
+
+    /// <summary>
+    /// Send the passed notification from a native websocket context
+    /// </summary>
+    public async Task SendNotifications(GotifyMessage iGotifyMessage, string wsUrl, string clientToken)
+    {
+        if (string.IsNullOrWhiteSpace(clientToken))
+        {
+            Console.WriteLine("ClientToken for sending notification is empty.");
+            return;
+        }
+
         var title = iGotifyMessage.title;
         var msg = iGotifyMessage.message;
 
-        var protocol = webSock.Url.ToString().Contains("ws://") ? "http://" : "https://";
-        var gotifyServerUrl = webSock.Url.ToString().Replace("ws://", "").Replace("wss://", "").Replace("\"", "")
+        var protocol = wsUrl.Contains("ws://") ? "http://" : "https://";
+        var gotifyServerUrl = wsUrl.Replace("ws://", "").Replace("wss://", "").Replace("\"", "")
             .Split("/stream");
         var imageUrl = gotifyServerUrl.Length > 0
-            ? $"{protocol}{gotifyServerUrl[0]}$$${iGotifyMessage.appid}$$${webSock.Name}"
+            ? $"{protocol}{gotifyServerUrl[0]}$$${iGotifyMessage.appid}$$${clientToken}"
             : "";
 
-        var usr = await DatabaseService.GetUser(webSock.Name!);
+        var usr = await DatabaseService.GetUser(clientToken);
 
         if (usr.Uid == 0)
         {
