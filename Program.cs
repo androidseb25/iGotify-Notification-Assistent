@@ -25,6 +25,13 @@ builder.Services.AddOpenApi();
 builder.Services.AddTransient<IStartupFilter, StartUpBuilder>();
 
 var app = builder.Build();
+
+if (Environments.enableUserUi)
+{
+    app.UseDefaultFiles(); // sucht automatisch index.html
+    app.UseStaticFiles(); // aktiviert wwwroot
+}
+
 app.UsePathBase("/api");
 
 app.UseCors(x => x
@@ -51,8 +58,9 @@ if (Environments.enableScalarUi)
     });
 }
 
-//app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-
 app.MapControllers();
+
+if (Environments.enableUserUi)
+    app.MapFallbackToFile("index.html");
 
 app.Run();

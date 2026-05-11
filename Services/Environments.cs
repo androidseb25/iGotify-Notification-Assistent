@@ -20,6 +20,15 @@ public class Environments
         }
     }
 
+    public static bool enableUserUi
+    {
+        get
+        {
+            var value = Environment.GetEnvironmentVariable("ENABLE_USER_UI") ?? "true";
+            return value == "true";
+        }
+    }
+
     public static string gotifyUrls
     {
         get { return Environment.GetEnvironmentVariable("GOTIFY_URLS") ?? ""; }
