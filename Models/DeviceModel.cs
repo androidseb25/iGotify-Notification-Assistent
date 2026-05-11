@@ -50,7 +50,7 @@ public class DeviceModel
     {
         if (string.IsNullOrWhiteSpace(clientToken))
         {
-            Console.WriteLine("ClientToken for sending notification is empty.");
+            AppLog.Warn("Notification", "Cannot send notification because client token is empty.");
             return;
         }
 
@@ -68,12 +68,15 @@ public class DeviceModel
 
         if (usr.Uid == 0)
         {
-            Console.WriteLine("THERE'S SOMETHING WRONG HERE? NO USER FOUND");
+            AppLog.Warn("Notification", $"No user found for client={AppLog.MaskSecret(clientToken)}");
         }
 
         var ntfy = new SecNtfy(Environments.secNtfyUrl);
         var response = await ntfy.SendNotification(usr.DeviceToken, title, msg, iGotifyMessage.priority == 10, imageUrl,
             iGotifyMessage.priority);
-        Console.WriteLine(response != null ? JsonConvert.SerializeObject(response) : "Notification response is null");
+        AppLog.Debug("Notification",
+            response != null
+                ? $"SecNtfy response client={AppLog.MaskSecret(clientToken)} response={JsonConvert.SerializeObject(response)}"
+                : $"SecNtfy response client={AppLog.MaskSecret(clientToken)} response=<null>");
     }
 }

@@ -62,7 +62,7 @@ public class WebSockClient
             //Console.WriteLine($"ReconnectionHappened {info.Type}");
             if (info.Type == ReconnectionType.Initial && isRestart)
             {
-                Console.WriteLine($"Gotify with Clienttoken: \"{clientToken}\" is successfully reconnected!");
+                AppLog.Info("WebSocket", $"Legacy reconnected client={AppLog.MaskSecret(clientToken)}");
             }
         });
 
@@ -70,24 +70,25 @@ public class WebSockClient
         ws.DisconnectionHappened.Subscribe(type =>
         {
             var wsName = ws.Name;
-            Console.WriteLine($"Disconnection happened, type: {type.Type}");
+            AppLog.Warn("WebSocket", $"Legacy disconnected client={AppLog.MaskSecret(wsName)} reason={type.Type}");
             switch (type.Type)
             {
                 case DisconnectionType.Lost:
-                    Console.WriteLine("Connection lost reconnect to Websocket...");
+                    AppLog.Info("WebSocket", $"Legacy reconnecting client={AppLog.MaskSecret(wsName)}");
                     // Stop();
                     Start(wsName, true);
                     break;
                 case DisconnectionType.Error:
                     if (type.Exception != null && type.Exception.Message.Contains("401"))
                     {
-                        Console.WriteLine($"ClientToken: {wsName} is not authorized and returned a 401 Unauthorized error! Skipping reconnection...");
+                        AppLog.Warn("WebSocket",
+                            $"Legacy unauthorized client={AppLog.MaskSecret(wsName)}; reconnect stopped.");
                         Stop();
                     }
                     else
                     {
-                        Console.WriteLine(
-                            $"Webseocket Reconnection failed with Error. Try to reconnect ClientToken: {wsName} in 10s.");
+                        AppLog.Warn("WebSocket",
+                            $"Legacy reconnect failed client={AppLog.MaskSecret(wsName)}; retry in 10s.");
                         ReconnectDelayed(wsName);
                     }
 
@@ -111,19 +112,18 @@ public class WebSockClient
                 var message = msg.ToString().Replace("client::display", "clientdisplay")
                     .Replace("client::notification", "clientnotification")
                     .Replace("android::action", "androidaction");
-                if (Environments.isLogEnabled)
-                    Console.WriteLine("Message converted: " + message);
+                AppLog.Debug("WebSocket", $"Legacy message received client={AppLog.MaskSecret(ws.Name)} payload={message}");
                 // var jsonData = JsonConvert.SerializeObject(message);
                 var gm = JsonConvert.DeserializeObject<GotifyMessage>(message);
                 // If object is null return and listen to the next message
                 if (gm == null)
                 {
-                    Console.WriteLine("GotifyMessage is null");
+                    AppLog.Warn("WebSocket", $"Legacy message ignored client={AppLog.MaskSecret(ws.Name)} reason=invalid-json");
                     return;
                 }
 
                 // Go and send the message 
-                Console.WriteLine($"WS Instance from: {ws.Name}");
+                AppLog.Debug("WebSocket", $"Legacy forwarding notification client={AppLog.MaskSecret(ws.Name)}");
                 await new DeviceModel().SendNotifications(gm, ws);
             }))
             .Concat() // executes sequentially
@@ -132,7 +132,7 @@ public class WebSockClient
         ws.Start();
 
         if (!isRestart)
-            Console.WriteLine("Done!");
+            AppLog.Info("WebSocket", $"Legacy started client={AppLog.MaskSecret(clientToken)}");
     }
 
     /// <summary>
@@ -151,7 +151,7 @@ public class WebSockClient
     {
         if (ws != null)
         {
-            Console.WriteLine("Stopping WebSocket...");
+            AppLog.Info("WebSocket", $"Legacy stopping client={AppLog.MaskSecret(clientToken)}");
             await ws!.Stop(WebSocketCloseStatus.Empty, "Connection closing.");
         }
 

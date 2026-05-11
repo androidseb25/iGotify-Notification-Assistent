@@ -7,6 +7,8 @@ namespace iGotify_Notification_Assist.Services;
 
 public sealed class WebSockClientNative
 {
+    private const int BufferSize = 8 * 1024;
+    private static readonly TimeSpan CloseTimeout = TimeSpan.FromSeconds(5);
     private ClientWebSocket? _socket;
     private volatile bool _isStopped;
 
@@ -14,6 +16,8 @@ public sealed class WebSockClientNative
     {
         var wsUrl = BuildWsUrl(user);
         var reconnectDelaySeconds = 1;
+        var client = AppLog.MaskSecret(user.ClientToken);
+        var gotify = AppLog.SafeUrl(user.GotifyUrl);
 
         while (!cancellationToken.IsCancellationRequested && !_isStopped)
         {
@@ -22,9 +26,9 @@ public sealed class WebSockClientNative
                 using var socket = CreateSocket(user);
                 _socket = socket;
 
-                Console.WriteLine($"Client connecting (native): {user.ClientToken}");
+                AppLog.Info("WebSocket", $"Connecting client={client} gotify={gotify}");
                 await socket.ConnectAsync(new Uri(wsUrl), cancellationToken);
-                Console.WriteLine($"Client connected (native): {user.ClientToken}");
+                AppLog.Info("WebSocket", $"Connected client={client}");
 
                 reconnectDelaySeconds = 1;
                 await ReceiveLoopAsync(socket, wsUrl, user.ClientToken, cancellationToken);
@@ -37,17 +41,16 @@ public sealed class WebSockClientNative
             {
                 if (wse.Message.Contains("401"))
                 {
-                    Console.WriteLine(
-                        $"ClientToken: {user.ClientToken} is not authorized and returned a 401 Unauthorized error! Skipping reconnection...");
+                    AppLog.Warn("WebSocket",
+                        $"Unauthorized client={client}; token rejected by Gotify. Reconnect stopped.");
                     break;
                 }
 
-                Console.WriteLine(
-                    $"Unable to connect or connection aborted for clientToken: {user.ClientToken}. {wse.Message}");
+                AppLog.Warn("WebSocket", $"Connection failed client={client}: {wse.Message}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Unexpected websocket error for clientToken: {user.ClientToken}. {ex.Message}");
+                AppLog.Error("WebSocket", $"Unexpected error client={client}", ex);
             }
             finally
             {
@@ -60,8 +63,7 @@ public sealed class WebSockClientNative
             var jitterMs = Random.Shared.Next(250, 1250);
             var delay = TimeSpan.FromSeconds(reconnectDelaySeconds) + TimeSpan.FromMilliseconds(jitterMs);
 
-            Console.WriteLine(
-                $"WebSocket reconnect for clientToken: {user.ClientToken} in {Math.Round(delay.TotalSeconds, 1)}s");
+            AppLog.Info("WebSocket", $"Reconnect scheduled client={client} delay={Math.Round(delay.TotalSeconds, 1)}s");
 
             try
             {
@@ -75,7 +77,7 @@ public sealed class WebSockClientNative
             reconnectDelaySeconds = Math.Min(reconnectDelaySeconds * 2, 30);
         }
 
-        Console.WriteLine($"Client disconnected (native): {user.ClientToken}");
+        AppLog.Info("WebSocket", $"Stopped client={client}");
     }
 
     public async Task StopAsync()
@@ -89,8 +91,9 @@ public sealed class WebSockClientNative
         {
             if (_socket.State == WebSocketState.Open || _socket.State == WebSocketState.CloseReceived)
             {
+                using var closeCts = new CancellationTokenSource(CloseTimeout);
                 await _socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection closing",
-                    CancellationToken.None);
+                    closeCts.Token);
             }
             else
             {
@@ -106,6 +109,7 @@ public sealed class WebSockClientNative
     private static ClientWebSocket CreateSocket(Users user)
     {
         var socket = new ClientWebSocket();
+        socket.Options.KeepAliveInterval = TimeSpan.FromSeconds(30);
 
         if (string.IsNullOrWhiteSpace(user.Headers))
             return socket;
@@ -128,7 +132,14 @@ public sealed class WebSockClientNative
             if (string.IsNullOrWhiteSpace(header.Key) || string.IsNullOrWhiteSpace(header.Value))
                 continue;
 
-            socket.Options.SetRequestHeader(header.Key, header.Value);
+            try
+            {
+                socket.Options.SetRequestHeader(header.Key, header.Value);
+            }
+            catch (ArgumentException ex)
+            {
+                AppLog.Warn("WebSocket", $"Skipping invalid custom header name='{header.Key}': {ex.Message}");
+            }
         }
 
         return socket;
@@ -136,15 +147,27 @@ public sealed class WebSockClientNative
 
     private static string BuildWsUrl(Users user)
     {
-        var socket = user.GotifyUrl.Contains("http://") ? "ws" : "wss";
-        var gotifyServerUrl = user.GotifyUrl.Replace("http://", "").Replace("https://", "").Replace("\"", "");
-        return $"{socket}://{gotifyServerUrl}/stream?token={user.ClientToken}";
+        var gotifyUrl = user.GotifyUrl.Trim().Trim('"');
+        if (!gotifyUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+            !gotifyUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            gotifyUrl = $"https://{gotifyUrl}";
+        }
+
+        var builder = new UriBuilder(gotifyUrl)
+        {
+            Scheme = gotifyUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ? "ws" : "wss",
+            Path = CombinePath(new Uri(gotifyUrl).AbsolutePath, "stream"),
+            Query = $"token={Uri.EscapeDataString(user.ClientToken)}"
+        };
+
+        return builder.Uri.ToString();
     }
 
     private static async Task ReceiveLoopAsync(ClientWebSocket socket, string wsUrl, string clientToken,
         CancellationToken cancellationToken)
     {
-        var buffer = new byte[8 * 1024];
+        var buffer = new byte[BufferSize];
 
         while (!cancellationToken.IsCancellationRequested && socket.State == WebSocketState.Open)
         {
@@ -174,8 +197,7 @@ public sealed class WebSockClientNative
                 .Replace("client::notification", "clientnotification")
                 .Replace("android::action", "androidaction");
 
-            if (Environments.isLogEnabled)
-                Console.WriteLine("Message converted: " + message);
+            AppLog.Debug("WebSocket", $"Message received client={AppLog.MaskSecret(clientToken)} payload={message}");
 
             GotifyMessage? gm;
             try
@@ -189,12 +211,21 @@ public sealed class WebSockClientNative
 
             if (gm == null)
             {
-                Console.WriteLine("GotifyMessage is null");
+                AppLog.Warn("WebSocket", $"Message ignored client={AppLog.MaskSecret(clientToken)} reason=invalid-json");
                 continue;
             }
 
-            Console.WriteLine($"WS Instance from (native): {clientToken}");
+            AppLog.Debug("WebSocket", $"Forwarding notification client={AppLog.MaskSecret(clientToken)}");
             await new DeviceModel().SendNotifications(gm, wsUrl, clientToken);
         }
+    }
+
+    private static string CombinePath(string basePath, string path)
+    {
+        var normalizedBasePath = string.IsNullOrWhiteSpace(basePath) || basePath == "/"
+            ? ""
+            : basePath.TrimEnd('/');
+
+        return $"{normalizedBasePath}/{path.TrimStart('/')}";
     }
 }

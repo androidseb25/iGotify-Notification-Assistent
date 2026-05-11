@@ -42,7 +42,7 @@ Download Link to iGotify down below
 
 *These three environment variables above aren't required when the Gotify & iGotify Instances available over a domain!*
 
-* `ENABLE_CONSOLE_LOG` = you can disable unnecessary console logs (default: true)
+* `ENABLE_CONSOLE_LOG` = enable application console logs (default: true)
 * `ENABLE_SCALAR_UI` = you can now disable the Endpoint page (default: true)
 
 *please write the boolean variables (true, false) in single quotes 'true'*
