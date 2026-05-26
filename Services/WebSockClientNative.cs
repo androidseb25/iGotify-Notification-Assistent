@@ -19,6 +19,7 @@ public sealed class WebSockClientNative
         var client = AppLog.MaskSecret(user.ClientToken);
         var gotify = AppLog.SafeUrl(user.GotifyUrl);
 
+        AppLog.Info("WebSocket", $"Url is: {wsUrl}");
         while (!cancellationToken.IsCancellationRequested && !_isStopped)
         {
             try

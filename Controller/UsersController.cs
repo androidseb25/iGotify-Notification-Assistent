@@ -23,6 +23,14 @@ public class UsersController : ControllerBase
             return Ok(new { Message = "User Body is empty!" });
         
         bool isUpdated = await DatabaseService.UpdateUser(user);
+
+        if (isUpdated)
+        {
+            var gss = GotifySocketService.getInstance();
+            GotifySocketService.KillAllWsThread();
+            gss.Start();
+        }
+        
         return Ok(new { Message = isUpdated ? "User successfully updated!" : "User didn't updated!" });
     }
     
@@ -34,6 +42,14 @@ public class UsersController : ControllerBase
         Users? usr = userList.Find(x => x.Uid == userId);
         if (usr != null)
             isDeleted = await usr.Delete();
+
+        if (isDeleted)
+        {
+            var gss = GotifySocketService.getInstance();
+            GotifySocketService.KillAllWsThread();
+            gss.Start();
+        }
+        
         return Ok(new { Message = isDeleted ? "User successfully deleted!" : "User didn't deleted!" });
     }
 }
