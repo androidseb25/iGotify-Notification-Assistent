@@ -10,18 +10,20 @@ namespace iGotify_Notification_Assist.Controller;
 public class UsersController : ControllerBase
 {
     [HttpGet]
+    [ServiceFilter(typeof(AuthenticationFilter))]
     public async Task<IActionResult> GetAllUsers()
     {
         List<Users> userList = await DatabaseService.GetUsers();
         return Ok(new { Message = "Users successfully retrieved!", Data = userList });
     }
-    
+
     [HttpPatch]
+    [ServiceFilter(typeof(AuthenticationFilter))]
     public async Task<IActionResult> PatchUser([FromBody] Users? user)
     {
         if (user == null)
             return Ok(new { Message = "User Body is empty!" });
-        
+
         bool isUpdated = await DatabaseService.UpdateUser(user);
 
         if (isUpdated)
@@ -30,11 +32,12 @@ public class UsersController : ControllerBase
             GotifySocketService.KillAllWsThread();
             gss.Start();
         }
-        
+
         return Ok(new { Message = isUpdated ? "User successfully updated!" : "User didn't updated!" });
     }
-    
+
     [HttpDelete("{userId}")]
+    [ServiceFilter(typeof(AuthenticationFilter))]
     public async Task<IActionResult> DeleteUser(int userId)
     {
         bool isDeleted = false;
@@ -49,7 +52,7 @@ public class UsersController : ControllerBase
             GotifySocketService.KillAllWsThread();
             gss.Start();
         }
-        
+
         return Ok(new { Message = isDeleted ? "User successfully deleted!" : "User didn't deleted!" });
     }
 }

@@ -20,6 +20,13 @@ builder.Services.Configure<JsonOptions>(options =>
     options.SerializerOptions.PropertyNamingPolicy = null; // Preserve exact casing
 });
 
+
+if (Environments.enableUserUi)
+{
+    builder.Services.AddSingleton<PasswordGenerator>();
+    builder.Services.AddScoped<AuthenticationFilter>();
+}
+
 builder.Services.AddSingleton(builder.Configuration);
 builder.Services.AddOpenApi();
 builder.Services.AddTransient<IStartupFilter, StartUpBuilder>();
