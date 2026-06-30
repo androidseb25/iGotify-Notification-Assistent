@@ -1,0 +1,2 @@
+var e={name:"equals",meta:{tags:["equals","same","identical","match","balance"]},svg:{xmlns:"http://www.w3.org/2000/svg",width:20,height:20,viewBox:"0 0 20 20",fill:"none"},nodes:[["path",{d:"M17 12.25C17.4142 12.25 17.75 12.5858 17.75 13C17.75 13.4142 17.4142 13.75 17 13.75H3C2.58579 13.75 2.25 13.4142 2.25 13C2.25 12.5858 2.58579 12.25 3 12.25H17ZM17 6.25C17.4142 6.25 17.75 6.58579 17.75 7C17.75 7.41421 17.4142 7.75 17 7.75H3C2.58579 7.75 2.25 7.41421 2.25 7C2.25 6.58579 2.58579 6.25 3 6.25H17Z",fill:"currentColor",key:"km5bp0"}]]};
+export{e as equals};

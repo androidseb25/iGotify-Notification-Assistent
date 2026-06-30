@@ -1,0 +1,2 @@
+var o={name:"sort-down",meta:{tags:["sort-down","descending","down","decrease","lower"]},svg:{xmlns:"http://www.w3.org/2000/svg",width:20,height:20,viewBox:"0 0 20 20",fill:"none"},nodes:[["path",{d:"M17 5.75C17.3034 5.75 17.5773 5.93263 17.6934 6.21289C17.8094 6.49313 17.7448 6.81579 17.5303 7.03027L10.5303 14.0303C10.2374 14.3232 9.76263 14.3232 9.46974 14.0303L2.46974 7.03027C2.25526 6.81579 2.19061 6.49313 2.30665 6.21289C2.42274 5.93263 2.69667 5.75 3.00001 5.75H17ZM10 12.4395L15.1895 7.25H4.81056L10 12.4395Z",fill:"currentColor",key:"cahri1"}]]};
+export{o as sortDown};

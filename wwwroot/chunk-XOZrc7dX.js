@@ -1,0 +1,2 @@
+var o={name:"sort-down-fill",meta:{tags:["sort-down-fill","descending","arrange","reduction"]},svg:{xmlns:"http://www.w3.org/2000/svg",width:20,height:20,viewBox:"0 0 20 20",fill:"none"},nodes:[["path",{d:"M16.9997 5.75C17.303 5.75 17.5769 5.9327 17.6931 6.21289C17.8091 6.49313 17.7444 6.81579 17.53 7.03027L10.53 14.0303C10.2371 14.323 9.76226 14.3231 9.46942 14.0303L2.46942 7.03027C2.2551 6.81582 2.19039 6.49303 2.30634 6.21289C2.42238 5.93274 2.69648 5.75013 2.99969 5.75H16.9997Z",fill:"currentColor",key:"ewos3p"}]]};
+export{o as sortDownFill};

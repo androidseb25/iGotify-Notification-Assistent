@@ -1,0 +1,2 @@
+var e={name:"horizontal-rule",meta:{tags:["divider","separator","line","section break","horizontal-rule"]},svg:{xmlns:"http://www.w3.org/2000/svg",width:20,height:20,viewBox:"0 0 20 20",fill:"none"},nodes:[["path",{d:"M17 9.25C17.4142 9.25 17.75 9.58579 17.75 10C17.75 10.4142 17.4142 10.75 17 10.75H3C2.58579 10.75 2.25 10.4142 2.25 10C2.25 9.58579 2.58579 9.25 3 9.25H17Z",fill:"currentColor",key:"iu8x2q"}]]};
+export{e as horizontalRule};

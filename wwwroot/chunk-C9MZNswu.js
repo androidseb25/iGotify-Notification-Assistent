@@ -1,0 +1,2 @@
+var e={name:"ethereum",meta:{tags:["ethereum","cryptocurrency","blockchain","digital","currency"]},svg:{xmlns:"http://www.w3.org/2000/svg",width:20,height:20,viewBox:"0 0 20 20",fill:"none"},nodes:[["path",{d:"M14.7469 10.1594L10 13.2406L5.25 10.1594L10 1.5L14.7469 10.1594ZM10 14.2301L5.25 11.1488L10 18.5L14.75 11.1488L10 14.2301Z",fill:"currentColor",key:"wiuw8x"}]]};
+export{e as ethereum};

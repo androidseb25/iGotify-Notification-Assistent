@@ -1,0 +1,2 @@
+var t={name:"twitch",meta:{tags:["twitch","live","streaming","video","game","broadcast"]},svg:{xmlns:"http://www.w3.org/2000/svg",width:20,height:20,viewBox:"0 0 20 20",fill:"none"},nodes:[["path",{d:"M9.70595 5.144H10.874V8.568H9.70595M12.916 5.144H14.084V8.568H12.916M5.91599 2L3 4.856V15.144H6.49592V18L9.42007 15.144H11.748L17 10V2M15.832 9.432L13.5041 11.712H11.168L9.12602 13.712V11.712H6.49592V3.144H15.832V9.432Z",fill:"currentColor",key:"2rwtvk"}]]};
+export{t as twitch};

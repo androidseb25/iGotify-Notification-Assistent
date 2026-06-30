@@ -1,0 +1,2 @@
+var t={name:"twitter",meta:{tags:["twitter","social-media","tweet","bird","x"]},svg:{xmlns:"http://www.w3.org/2000/svg",width:20,height:20,viewBox:"0 0 20 20",fill:"none"},nodes:[["path",{d:"M14.5997 2.75H17.0543L11.6932 8.89159L18 17.25H13.063L9.19339 12.182L4.77097 17.25H2.31291L8.04607 10.6797L2 2.75H7.06215L10.5563 7.38233L14.5997 2.75ZM13.7375 15.7791H15.0969L6.3216 4.14423H4.86136L13.7375 15.7791Z",fill:"currentColor",key:"vfwqlp"}]]};
+export{t as twitter};

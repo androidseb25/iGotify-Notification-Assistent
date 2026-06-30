@@ -1,0 +1,2 @@
+var o={name:"bookmark-fill",meta:{tags:["bookmark-fill","save","favorite","keep"]},svg:{xmlns:"http://www.w3.org/2000/svg",width:20,height:20,viewBox:"0 0 20 20",fill:"none"},nodes:[["path",{d:"M13.75 1.25C15.2642 1.25 16.5 2.48579 16.5 4V18C16.5 18.2792 16.3451 18.5357 16.0977 18.665C15.8501 18.7944 15.5505 18.7747 15.3213 18.6152L10 14.9131L4.67871 18.6152C4.44946 18.7747 4.14985 18.7944 3.90234 18.665C3.65491 18.5357 3.5 18.2792 3.5 18V4C3.5 2.48579 4.73579 1.25 6.25 1.25H13.75Z",fill:"currentColor",key:"3udkb0"}]]};
+export{o as bookmarkFill};

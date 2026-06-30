@@ -1,0 +1,2 @@
+var a={name:"slash",meta:{tags:["divide","separator","diagonal","fraction","slash"]},svg:{xmlns:"http://www.w3.org/2000/svg",width:20,height:20,viewBox:"0 0 20 20",fill:"none"},nodes:[["path",{d:"M17.2479 1.69152C17.5408 1.39863 18.0156 1.39863 18.3085 1.69152C18.6014 1.98441 18.6014 2.45929 18.3085 2.75218L2.75218 18.3085C2.45929 18.6014 1.98442 18.6014 1.69152 18.3085C1.39863 18.0156 1.39863 17.5408 1.69152 17.2479L17.2479 1.69152Z",fill:"currentColor",key:"3pf7sd"}]]};
+export{a as slash};
