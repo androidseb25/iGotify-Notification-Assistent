@@ -1,2 +1,0 @@
-var o={name:"info",meta:{tags:["info","information","help","details"]},svg:{xmlns:"http://www.w3.org/2000/svg",width:20,height:20,viewBox:"0 0 20 20",fill:"none"},nodes:[["path",{d:"M10 7.25C10.4142 7.25 10.75 7.58579 10.75 8V15C10.75 15.4142 10.4142 15.75 10 15.75C9.58579 15.75 9.25 15.4142 9.25 15V8C9.25 7.58579 9.58579 7.25 10 7.25ZM10 4.25C10.4142 4.25 10.75 4.58579 10.75 5V5.5C10.75 5.91421 10.4142 6.25 10 6.25C9.58579 6.25 9.25 5.91421 9.25 5.5V5C9.25 4.58579 9.58579 4.25 10 4.25Z",fill:"currentColor",key:"amvllo"}]]};
-export{o as info};

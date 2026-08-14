@@ -1,2 +1,0 @@
-var e={name:"circle",meta:{tags:["circle","round","cycle","loop","circular"]},svg:{xmlns:"http://www.w3.org/2000/svg",width:20,height:20,viewBox:"0 0 20 20",fill:"none"},nodes:[["path",{d:"M17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C5.85786 2.5 2.5 5.85786 2.5 10C2.5 14.1421 5.85786 17.5 10 17.5C14.1421 17.5 17.5 14.1421 17.5 10ZM19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1C14.9706 1 19 5.02944 19 10Z",fill:"currentColor",key:"3ypx3o"}]]};
-export{e as circle};
