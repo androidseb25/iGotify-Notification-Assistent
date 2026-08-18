@@ -3,6 +3,11 @@
 [![Crowdin](https://badges.crowdin.net/igotify/localized.svg)](https://crowdin.com/project/igotify)
 
 
+> ## Gotify version 3.0.0 currently not supported !!!
+> please use directly the build 2.9.1
+> i will fix it after my vacation in 2 weeks also take a look here to follow the progress #250
+
+
 # iGotify
 
 A notification assistant that bridges [Gotify](https://gotify.net/) with iOS devices via Apple's APNs using the SecNtfy service.

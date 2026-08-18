@@ -1,21 +1,51 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
-title: "[FEATURE REQUEST]"
-labels: Feature Request
-assignees: androidseb25
+name: ✨ Feature request
+about: Suggest an idea or improvement for iGotify
+title: "[FEATURE] "
+labels: "Feature Request"
+assignees:
+  - androidseb25
+---
+
+## 🚩 Problem Description
+Is your feature request related to a problem?  
+Please describe the problem clearly and concisely.
+
+> Language: English or German
+
+Example:  
+"I'm often frustrated when …"
 
 ---
 
-**Is your feature request related to a problem? Please describe. **
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
-Language of description allowed: English/German
+## 💡 Proposed Solution
+Describe the solution or feature you would like to see implemented.
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+---
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+## 🔄 Alternatives Considered
+Describe any alternative solutions or features you have considered.
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+---
+
+## 📸 Mockups / Screenshots (optional)
+Add mockups, screenshots, or diagrams if they help explain your idea.
+
+---
+
+## 🎯 Use Case
+Describe how this feature would be used and who would benefit from it.
+
+---
+
+## ✔️ Checklist
+Please confirm the following before submitting:
+
+- [ ] I searched existing issues and feature requests
+- [ ] This feature request is not a duplicate
+- [ ] This request describes a single, clear feature
+
+---
+
+## ℹ️ Additional Context
+Add any other context or information about the feature request here.
