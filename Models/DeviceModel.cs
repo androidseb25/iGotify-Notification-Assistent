@@ -40,26 +40,43 @@ public class DeviceModel
     /// <param name="clientToken"></param>
     public async Task SendNotifications(GotifyMessage iGotifyMessage, WebsocketClient webSock)
     {
+        await SendNotifications(iGotifyMessage, webSock.Url.ToString(), webSock.Name ?? "");
+    }
+
+    /// <summary>
+    /// Send the passed notification from a native websocket context
+    /// </summary>
+    public async Task SendNotifications(GotifyMessage iGotifyMessage, string wsUrl, string clientToken)
+    {
+        if (string.IsNullOrWhiteSpace(clientToken))
+        {
+            AppLog.Warn("Notification", "Cannot send notification because client token is empty.");
+            return;
+        }
+
         var title = iGotifyMessage.title;
         var msg = iGotifyMessage.message;
 
-        var protocol = webSock.Url.ToString().Contains("ws://") ? "http://" : "https://";
-        var gotifyServerUrl = webSock.Url.ToString().Replace("ws://", "").Replace("wss://", "").Replace("\"", "")
+        var protocol = wsUrl.Contains("ws://") ? "http://" : "https://";
+        var gotifyServerUrl = wsUrl.Replace("ws://", "").Replace("wss://", "").Replace("\"", "")
             .Split("/stream");
         var imageUrl = gotifyServerUrl.Length > 0
-            ? $"{protocol}{gotifyServerUrl[0]}$$${iGotifyMessage.appid}$$${webSock.Name}"
+            ? $"{protocol}{gotifyServerUrl[0]}$$${iGotifyMessage.appid}$$${clientToken}"
             : "";
 
-        var usr = await DatabaseService.GetUser(webSock.Name!);
+        var usr = await DatabaseService.GetUser(clientToken);
 
         if (usr.Uid == 0)
         {
-            Console.WriteLine("THERE'S SOMETHING WRONG HERE? NO USER FOUND");
+            AppLog.Warn("Notification", $"No user found for client={AppLog.MaskSecret(clientToken)}");
         }
 
         var ntfy = new SecNtfy(Environments.secNtfyUrl);
         var response = await ntfy.SendNotification(usr.DeviceToken, title, msg, iGotifyMessage.priority == 10, imageUrl,
             iGotifyMessage.priority);
-        Console.WriteLine(response != null ? JsonConvert.SerializeObject(response) : "Notification response is null");
+        AppLog.Debug("Notification",
+            response != null
+                ? $"SecNtfy response client={AppLog.MaskSecret(clientToken)} response={JsonConvert.SerializeObject(response)}"
+                : $"SecNtfy response client={AppLog.MaskSecret(clientToken)} response=<null>");
     }
 }

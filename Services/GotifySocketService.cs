@@ -1,5 +1,6 @@
 using System.Net.Sockets;
 using System.Net.WebSockets;
+using System.Collections.Concurrent;
 using iGotify_Notification_Assist.Models;
 using SecNtfyNuGet;
 
@@ -13,6 +14,14 @@ public class GotifySocketService
 
     // Data structure for tracking threads and WebSocket connections
     private static List<ThreadSocket>? _threadSockets;
+    private static readonly ConcurrentDictionary<string, NativeSocketRuntime> _nativeSockets = new();
+
+    private sealed class NativeSocketRuntime
+    {
+        public required CancellationTokenSource Cts { get; init; }
+        public Task RunnerTask { get; set; } = Task.CompletedTask;
+        public required WebSockClientNative Client { get; init; }
+    }
 
     public static GotifySocketService getInstance()
     {
@@ -33,7 +42,7 @@ public class GotifySocketService
             DatabaseService.UpdateDatebase(path, "Users", "Headers", "text not null default ''");
         }
 
-        Console.WriteLine($"Database is created: {isDbFileExists}");
+        AppLog.Info("Startup", $"Database initialized success={isDbFileExists}");
         isInit = isDbFileExists;
     }
 
@@ -62,6 +71,8 @@ public class GotifySocketService
                 _threadSockets.Remove(threadSocket);
             }
         }
+
+        StopNativeSocket(clientToken);
     }
 
     public static void KillAllWsThread()
@@ -84,7 +95,7 @@ public class GotifySocketService
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    AppLog.Error("WebSocket", "Failed to stop legacy websocket thread", e);
                 }
                 finally
                 {
@@ -93,6 +104,11 @@ public class GotifySocketService
             }
 
             _threadSockets.Clear();
+        }
+
+        foreach (var clientToken in _nativeSockets.Keys)
+        {
+            StopNativeSocket(clientToken);
         }
     }
 
@@ -112,7 +128,7 @@ public class GotifySocketService
             threadSocket.thread.Start();
         }
         else
-            Console.WriteLine($"Client: {clientToken} already connected! Skipping...");
+            AppLog.Info("WebSocket", $"Legacy client already running client={AppLog.MaskSecret(clientToken)}");
     }
 
     public static void StartWsThread(Users user)
@@ -131,7 +147,39 @@ public class GotifySocketService
             threadSocket.thread.Start();
         }
         else
-            Console.WriteLine($"Client: {user.ClientToken} already connected! Skipping...");
+            AppLog.Info("WebSocket", $"Legacy client already running client={AppLog.MaskSecret(user.ClientToken)}");
+    }
+
+    public static void StartNativeWsTask(Users user)
+    {
+        if (string.IsNullOrWhiteSpace(user.ClientToken))
+            return;
+
+        var cts = new CancellationTokenSource();
+        var nativeClient = new WebSockClientNative();
+        var runtime = new NativeSocketRuntime
+        {
+            Cts = cts,
+            Client = nativeClient
+        };
+
+        if (!_nativeSockets.TryAdd(user.ClientToken, runtime))
+        {
+            AppLog.Info("WebSocket", $"Client already running client={AppLog.MaskSecret(user.ClientToken)}");
+            cts.Cancel();
+            cts.Dispose();
+            return;
+        }
+
+        AppLog.Info("WebSocket",
+            $"Starting client={AppLog.MaskSecret(user.ClientToken)} gotify={AppLog.SafeUrl(user.GotifyUrl)}");
+
+        runtime.RunnerTask = Task.Run(() => nativeClient.RunAsync(user, cts.Token), cts.Token);
+        runtime.RunnerTask.ContinueWith(_ =>
+        {
+            if (_nativeSockets.TryRemove(user.ClientToken, out var completedRuntime))
+                completedRuntime.Cts.Dispose();
+        }, TaskScheduler.Default);
     }
 
     private static void StartWsConn(ThreadSocket threadSocket, Users user)
@@ -148,7 +196,7 @@ public class GotifySocketService
                 wsUrl = $"{socket}://{gotifyServerUrl}/stream?token={user.ClientToken}";
 
                 // Starting WebSocket instance
-                Console.WriteLine("Client connecting...");
+                AppLog.Info("WebSocket", $"Legacy connecting client={AppLog.MaskSecret(user.ClientToken)}");
                 var wsc = new WebSockClient { URL = wsUrl, user = user };
                 wsc.Start(user.ClientToken);
                 // Connect the client
@@ -158,14 +206,13 @@ public class GotifySocketService
             }
             catch (WebSocketException wse)
             {
-                Console.WriteLine(
-                    $"Unable to Connect to WS or WSS connection aborted with clientToken: {user.ClientToken}");
-                Console.WriteLine(wse.StackTrace);
+                AppLog.Error("WebSocket", $"Legacy connection failed client={AppLog.MaskSecret(user.ClientToken)}",
+                    wse);
                 //currentProcess.Kill(true);
             }
         }
 
-        Console.WriteLine($"Client disconnected: {user.ClientToken}");
+        AppLog.Info("WebSocket", $"Legacy stopped client={AppLog.MaskSecret(user.ClientToken)}");
     }
 
     private static void StartWsConn(ThreadSocket threadSocket, string gotifyServerUrl, string clientToken)
@@ -182,7 +229,7 @@ public class GotifySocketService
                 wsUrl = $"{socket}://{gotifyServerUrl}/stream?token={clientToken}";
 
                 // Starting WebSocket instance
-                Console.WriteLine("Client connecting...");
+                AppLog.Info("WebSocket", $"Legacy connecting client={AppLog.MaskSecret(clientToken)}");
                 var wsc = new WebSockClient { URL = wsUrl };
                 wsc.Start(clientToken);
                 // Connect the client
@@ -195,13 +242,12 @@ public class GotifySocketService
             }
             catch (WebSocketException wse)
             {
-                Console.WriteLine($"Unable to Connect to WS or WSS connection aborted with clientToken: {clientToken}");
-                Console.WriteLine(wse.StackTrace);
+                AppLog.Error("WebSocket", $"Legacy connection failed client={AppLog.MaskSecret(clientToken)}", wse);
                 //currentProcess.Kill(true);
             }
         }
 
-        Console.WriteLine($"Client disconnected: {clientToken}");
+        AppLog.Info("WebSocket", $"Legacy stopped client={AppLog.MaskSecret(clientToken)}");
     }
 
     /// <summary>
@@ -247,82 +293,69 @@ public class GotifySocketService
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Error: {e.Message}");
-                Console.WriteLine("Something went wrong when inserting you're connection!");
-                Console.WriteLine("Please check you're environment lists!");
+                AppLog.Error("Startup", "Failed to import connection settings from environment variables", e);
+                AppLog.Warn("Startup", "Check GOTIFY_URLS, GOTIFY_CLIENT_TOKENS and SECNTFY_TOKENS.");
             }
         }
         else
         {
             var statusServerList = gotifyUrlList.Count == 0 ? "empty" : "filled";
-            Console.WriteLine($"Gotify Url list is: {statusServerList}");
+            AppLog.Info("Startup", $"GOTIFY_URLS={statusServerList}");
             var statusClientList = gotifyClientList.Count == 0 ? "empty" : "filled";
-            Console.WriteLine($"Gotify Client list is: {statusClientList}");
+            AppLog.Info("Startup", $"GOTIFY_CLIENT_TOKENS={statusClientList}");
             var statusNtfyList = secntfyTokenList.Count == 0 ? "empty" : "filled";
-            Console.WriteLine($"SecNtfy Token list is: {statusNtfyList}");
-            Console.WriteLine(
-                $"If one or more lists are empty please check the environment variable! GOTIFY_URLS or GOTIFY_CLIENT_TOKENS or SECNTFY_TOKENS");
-            Console.WriteLine(
-                $"If all lists are empty do nothing, you will configure the gotify server over the iGotify app.");
+            AppLog.Info("Startup", $"SECNTFY_TOKENS={statusNtfyList}");
+            AppLog.Info("Startup", "No environment connections found; waiting for app configuration.");
         }
 
         var userList = await DatabaseService.GetUsers();
-
-        StartConnection(userList, secntfyUrl);
+        await StartConnection(userList, secntfyUrl);
     }
 
-    private async void StartConnection(List<Users> userList, string secntfyUrl)
+    private async Task StartConnection(List<Users> userList, string secntfyUrl)
     {
+        try
+        {
+            var isSecNtfyAvailable = await SecNtfy.CheckIfUrlReachable(secntfyUrl);
+            if (!isSecNtfyAvailable)
+                AppLog.Warn("SecNtfy", $"Server unavailable url={AppLog.SafeUrl(secntfyUrl)}");
+        }
+        catch
+        {
+            AppLog.Warn("SecNtfy",
+                $"Availability check failed url={AppLog.SafeUrl(secntfyUrl)}; websocket clients will still start.");
+        }
+
         foreach (var user in userList)
         {
-            string isGotifyAvailable;
-            string isSecNtfyAvailable;
-            try
-            {
-                isGotifyAvailable = await SecNtfy.CheckIfUrlReachable(user.GotifyUrl) ? "yes" : "no";
+            AppLog.Info("WebSocket",
+                $"Configured client={AppLog.MaskSecret(user.ClientToken)} gotify={AppLog.SafeUrl(user.GotifyUrl)} secntfy={AppLog.SafeUrl(secntfyUrl)}");
 
-                if (isGotifyAvailable == "no")
-                {
-                    StartConnection(userList, secntfyUrl);
-                    return;
-                }
-            }
-            catch
-            {
-                Console.WriteLine($"Gotify Server: '{user.GotifyUrl}' is not available try to reconnect in 10s.");
-                StartDelayedConnection(userList, secntfyUrl);
-                return;
-            }
-            
-            try
-            {
-                bool isSecNtfyAvailableBool = await SecNtfy.CheckIfUrlReachable(secntfyUrl);
-                isSecNtfyAvailable = isSecNtfyAvailableBool ? "yes" : "no";
-                
-                if (!isSecNtfyAvailableBool)
-                    Console.WriteLine($"SecNtfy Server: '{secntfyUrl}' is not available, please check your internet connection!");
-            }
-            catch
-            {
-                Console.WriteLine($"SecNtfy Server: '{secntfyUrl}' is not available try to reconnect in 10s.");
-                StartDelayedConnection(userList, secntfyUrl);
-                return;
-            }
-
-            Console.WriteLine($"Gotify - Url: {user.GotifyUrl}");
-            Console.WriteLine($"Is Gotify - Url available: {isGotifyAvailable}");
-            Console.WriteLine($"SecNtfy Server - Url: {secntfyUrl}");
-            Console.WriteLine($"Is SecNtfy Server - Url available: {isSecNtfyAvailable}");
-            Console.WriteLine($"Client - Token: {user.ClientToken}");
-
-            StartWsThread(user);
+            // StartWsThread(user); // legacy websocket.client implementation
+            StartNativeWsTask(user);
         }
     }
 
-    private async void StartDelayedConnection(List<Users> userList, string secntfyUrl)
+    private static void StopNativeSocket(string clientToken)
     {
-        await Task.Delay(10000);
-        Console.WriteLine("Reconnecting...");
-        StartConnection(userList, secntfyUrl);
+        if (!_nativeSockets.TryRemove(clientToken, out var runtime))
+            return;
+
+        AppLog.Info("WebSocket", $"Stopping client={AppLog.MaskSecret(clientToken)}");
+
+        try
+        {
+            runtime.Cts.Cancel();
+            runtime.Client.StopAsync().GetAwaiter().GetResult();
+            runtime.RunnerTask.Wait(millisecondsTimeout: 500);
+        }
+        catch (Exception e)
+        {
+            AppLog.Error("WebSocket", $"Failed to stop client={AppLog.MaskSecret(clientToken)}", e);
+        }
+        finally
+        {
+            runtime.Cts.Dispose();
+        }
     }
 }

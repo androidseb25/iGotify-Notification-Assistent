@@ -22,9 +22,7 @@ public class DeviceController : ControllerBase
         string result;
         bool resultBool;
 
-        Console.WriteLine($"ClientToken: {deviceModel.ClientToken}");
-        Console.WriteLine($"DeviceToken: {deviceModel.DeviceToken}");
-        Console.WriteLine($"GotifyUrl: {deviceModel.GotifyUrl}");
+        AppLog.Info("Device", $"Register request client={AppLog.MaskSecret(deviceModel.ClientToken)} device={AppLog.MaskSecret(deviceModel.DeviceToken)} gotify={AppLog.SafeUrl(deviceModel.GotifyUrl)}");
 
         if (
             deviceModel.ClientToken.Length == 0 || deviceModel.ClientToken == "string" ||
@@ -66,7 +64,7 @@ public class DeviceController : ControllerBase
         string result;
         bool resultBool;
 
-        Console.WriteLine($"Delete Token: {token}");
+        AppLog.Info("Device", $"Delete request client={AppLog.MaskSecret(token)}");
         if (token.Length == 0 || token == "string")
         {
             result = "Error deleting device!";
@@ -145,8 +143,7 @@ public class DeviceController : ControllerBase
         var ntfy = new SecNtfy(Environments.secNtfyUrl);
         if (deviceToken.Length > 0)
             _ = await ntfy.SendNotification(deviceToken, "Test", "Test Notification");
-        if (Environments.isLogEnabled)
-            Console.WriteLine(ntfy.encTitle);
+        AppLog.Debug("Device", $"Test notification encryptedTitle={ntfy.encTitle}");
 
         return Ok();
     }

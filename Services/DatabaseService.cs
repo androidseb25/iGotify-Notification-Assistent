@@ -233,23 +233,30 @@ public static class DatabaseService
     public static async Task<List<Users>> GetUsers()
     {
         var userList = new List<Users>();
-        var path = $"{GetLocationsOf.App}/data";
-        //Create Database File
-        var pathToDb = Path.Combine(path, "users.db");
-        var isDbFileExists = File.Exists(pathToDb);
+        try
+        {
+            var path = $"{GetLocationsOf.App}/data";
+            //Create Database File
+            var pathToDb = Path.Combine(path, "users.db");
+            var isDbFileExists = File.Exists(pathToDb);
 
-        if (!isDbFileExists) return userList;
-        await using var dbConnection = new SqliteConnection(GetConnectionString.UsersDb(pathToDb));
-        dbConnection.Open();
+            if (!isDbFileExists) return userList;
+            await using var dbConnection = new SqliteConnection(GetConnectionString.UsersDb(pathToDb));
+            dbConnection.Open();
 
-        // Create a sample table
-        const string selectAllQuery = "SELECT * FROM Users u;";
-        userList = (await dbConnection.QueryAsync<Users>(selectAllQuery)).ToList();
+            // Create a sample table
+            const string selectAllQuery = "SELECT * FROM Users u;";
+            userList = (await dbConnection.QueryAsync<Users>(selectAllQuery)).ToList();
 
-        // Perform other database operations as needed
+            // Perform other database operations as needed
 
-        // Close the connection when done
-        dbConnection.Close();
+            // Close the connection when done
+            dbConnection.Close();
+        }
+        catch (Exception e)
+        {
+            AppLog.Error("APP", e.Message);
+        }
 
         return userList;
     }

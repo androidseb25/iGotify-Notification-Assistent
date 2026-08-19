@@ -14,4 +14,9 @@ public class Users
     {
         return await DatabaseService.UpdateUser(this);
     }
+
+    public async Task<bool> Delete()
+    {
+        return await DatabaseService.DeleteUser(ClientToken);
+    }
 }
