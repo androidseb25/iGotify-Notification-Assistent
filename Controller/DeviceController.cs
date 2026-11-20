@@ -9,7 +9,7 @@ namespace iGotify_Notification_Assist.Controller;
 
 [ApiController]
 [Route("[controller]")]
-public class DeviceController : ControllerBase
+public class DeviceController(GotifyRegistration registration) : ControllerBase
 {
     /// <summary>
     /// Add device token to the TXT for sending the push notificcation
@@ -19,38 +19,29 @@ public class DeviceController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> PostDeviceModel(DeviceModel deviceModel)
     {
-        string result;
-        bool resultBool;
-
-        AppLog.Info("Device", $"Register request client={AppLog.MaskSecret(deviceModel.ClientToken)} device={AppLog.MaskSecret(deviceModel.DeviceToken)} gotify={AppLog.SafeUrl(deviceModel.GotifyUrl)}");
-
+        const string failure = "Fehler beim hinzugefügen des Gerätes!";
         if (
-            deviceModel.ClientToken.Length == 0 || deviceModel.ClientToken == "string" ||
-            deviceModel.DeviceToken.Length == 0 || deviceModel.DeviceToken.Length < 60 ||
-            deviceModel.DeviceToken == "string" ||
-            deviceModel.GotifyUrl.Length == 0 || deviceModel.GotifyUrl == "string"
+            string.IsNullOrWhiteSpace(deviceModel.ClientToken) || deviceModel.ClientToken == "string" ||
+            string.IsNullOrWhiteSpace(deviceModel.DeviceToken) || deviceModel.DeviceToken.Length < 60 ||
+            string.IsNullOrWhiteSpace(deviceModel.GotifyUrl) || deviceModel.GotifyUrl == "string"
         )
-        {
-            result = "Fehler beim hinzugefügen des Gerätes!";
-            resultBool = false;
-            return Ok(new { Message = result, Successful = resultBool });
-        }
+            return Ok(new { Message = failure, Successful = false });
 
-        if (await deviceModel.Insert())
-        {
-            var gss = GotifySocketService.getInstance();
-            GotifySocketService.KillAllWsThread();
-            gss.Start();
-            result = "Gerät erfolgreich hinzugefügt";
-            resultBool = true;
-        }
-        else
-        {
-            result = "Fehler beim hinzugefügen des Gerätes!";
-            resultBool = false;
-        }
+        var gotifyUrl = await registration.VerifyAsync(deviceModel.GotifyUrl, deviceModel.ClientToken,
+            HttpContext.RequestAborted);
+        if (gotifyUrl is null)
+            return Ok(new { Message = failure, Successful = false });
 
-        return Ok(new { Message = result, Successful = resultBool });
+        HttpContext.RequestAborted.ThrowIfCancellationRequested();
+        deviceModel.GotifyUrl = gotifyUrl;
+        AppLog.Info("Device", $"Register request client={AppLog.MaskSecret(deviceModel.ClientToken)} device={AppLog.MaskSecret(deviceModel.DeviceToken)} gotify={AppLog.SafeUrl(gotifyUrl)}");
+        if (!await deviceModel.Insert())
+            return Ok(new { Message = failure, Successful = false });
+
+        var gss = GotifySocketService.getInstance();
+        GotifySocketService.KillAllWsThread();
+        gss.Start();
+        return Ok(new { Message = "Gerät erfolgreich hinzugefügt", Successful = true });
     }
 
     /// <summary>
