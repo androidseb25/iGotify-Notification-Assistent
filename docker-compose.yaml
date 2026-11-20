@@ -67,6 +67,8 @@ services:
     volumes:
       - api-data:/app/data
     environment:
+      # Approved Gotify URLs for automatic device registration
+      GOTIFY_REGISTRATION_URLS: ${GOTIFY_REGISTRATION_URLS:-}
       # Required only when NOT using a public domain
       # See wiki for details: https://github.com/androidseb25/iGotify-Notification-Assistent/wiki#environment-variables
       GOTIFY_URLS: ${GOTIFY_URLS:-}

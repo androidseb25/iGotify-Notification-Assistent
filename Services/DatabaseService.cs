@@ -88,8 +88,8 @@ public static class DatabaseService
         dbConnection.Open();
 
         // Create a sample table
-        var selectQuery = $"select count(*) from Users u where u.ClientToken = '{dm.ClientToken}';";
-        var id = await dbConnection.ExecuteScalarAsync<int>(selectQuery);
+        const string selectQuery = "select count(*) from Users u where u.ClientToken = @ClientToken;";
+        var id = await dbConnection.ExecuteScalarAsync<int>(selectQuery, new { dm.ClientToken });
 
         isExists = id > 0;
 
@@ -119,8 +119,8 @@ public static class DatabaseService
         dbConnection.Open();
 
         // Create a sample table
-        var deleteQuery = $"delete from Users where ClientToken = '{clientToken}';";
-        var rows = await dbConnection.ExecuteAsync(deleteQuery);
+        const string deleteQuery = "delete from Users where ClientToken = @ClientToken;";
+        var rows = await dbConnection.ExecuteAsync(deleteQuery, new { ClientToken = clientToken });
 
         isDeleted = rows > 0;
 
@@ -150,8 +150,8 @@ public static class DatabaseService
         dbConnection.Open();
 
         // Create a sample table
-        var updateQuery = $"UPDATE Users SET Headers = '{usr.Headers}' WHERE Uid = {usr.Uid};";
-        var rows = await dbConnection.ExecuteAsync(updateQuery);
+        const string updateQuery = "UPDATE Users SET Headers = @Headers WHERE Uid = @Uid;";
+        var rows = await dbConnection.ExecuteAsync(updateQuery, new { Headers = usr.Headers ?? "", usr.Uid });
 
         isUpdated = rows > 0;
 
@@ -181,9 +181,9 @@ public static class DatabaseService
         dbConnection.Open();
 
         // Create a sample table
-        var insertQuery =
-            $"insert into Users (ClientToken, DeviceToken, GotifyUrl, Headers) values ('{dm.ClientToken}', '{dm.DeviceToken}', '{dm.GotifyUrl}', '');";
-        var id = await dbConnection.ExecuteAsync(insertQuery);
+        const string insertQuery =
+            "insert into Users (ClientToken, DeviceToken, GotifyUrl, Headers) values (@ClientToken, @DeviceToken, @GotifyUrl, '');";
+        var id = await dbConnection.ExecuteAsync(insertQuery, new { dm.ClientToken, dm.DeviceToken, dm.GotifyUrl });
 
         inserted = id > 0;
 
@@ -213,10 +213,11 @@ public static class DatabaseService
         dbConnection.Open();
 
         // Create a sample table
-        var selectUserQuery = $"SELECT * FROM Users u where u.ClientToken = '{clientToken}';";
+        var selectUserQuery = "SELECT * FROM Users u where u.ClientToken = @Token;";
         if (clientToken.Contains("NTFY-DEVICE-"))
-            selectUserQuery = $"SELECT * FROM Users u where u.DeviceToken = '{clientToken}';";
-        usr = (await dbConnection.QueryAsync<Users>(selectUserQuery)).ToList().FirstOrDefault() ?? usr;
+            selectUserQuery = "SELECT * FROM Users u where u.DeviceToken = @Token;";
+        usr = (await dbConnection.QueryAsync<Users>(selectUserQuery, new { Token = clientToken }))
+            .ToList().FirstOrDefault() ?? usr;
 
         // Perform other database operations as needed
 

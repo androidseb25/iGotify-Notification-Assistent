@@ -6,6 +6,7 @@ public static class Environments
     private const string EnableScalarUi = "ENABLE_SCALAR_UI";
     private const string EnableUserUi = "ENABLE_USER_UI";
     private const string GotifyUrls = "GOTIFY_URLS";
+    private const string GotifyRegistrationUrls = "GOTIFY_REGISTRATION_URLS";
     private const string GotifyClientTokens = "GOTIFY_CLIENT_TOKENS";
     private const string SecNtfyTokens = "SECNTFY_TOKENS";
     private const string SecNtfyServerUrl = "SECNTFY_SERVER_URL";
@@ -17,6 +18,8 @@ public static class Environments
     public static bool enableUserUi => GetBool(EnableUserUi, defaultValue: true);
 
     public static string gotifyUrls => GetString(GotifyUrls);
+
+    public static string gotifyRegistrationUrls => GetString(GotifyRegistrationUrls);
 
     public static string gotifyClientTokens => GetString(GotifyClientTokens);
 

@@ -32,6 +32,7 @@ cd iGotify-Notification-Assistent
 # Configure environment
 cp .env.example .env
 # Edit .env and set GOTIFY_DEFAULTUSER_PASS
+# For automatic registration, set GOTIFY_REGISTRATION_URLS too.
 
 # Start the stack
 docker compose up -d
@@ -42,6 +43,24 @@ docker compose up -d
 ```bash
 curl -sSL https://raw.githubusercontent.com/androidseb25/iGotify-Notification-Assistent/main/install.sh | sudo bash
 ```
+
+### Automatic Device Registration
+
+For **External Instance** setup, set `GOTIFY_REGISTRATION_URLS` in the Assistant's environment to the Gotify base URL entered in the iOS app. Separate multiple URLs with semicolons.
+
+If the public URL uses an access proxy, you can verify tokens through a separate route to the same Gotify instance. Use an entry such as `https://gotify.example.org|http://gotify`. The first URL is used for the WebSocket connection and the second only for token validation.
+
+#### Upgrading to v1.6.1.0
+
+Keep the existing Docker data volume mounted at `/app/data` when you update. The Assistant reloads saved registrations from that volume and resumes push delivery after the container restarts.
+
+For **External Instance**, set `GOTIFY_REGISTRATION_URLS` before updating so the existing app can register another device or register again after signing out or reinstalling. An empty setting disables those registration requests. For a single Gotify instance, use the exact base URL entered in the app.
+
+```dotenv
+GOTIFY_REGISTRATION_URLS='https://gotify.example.org'
+```
+
+Manual **Local Instance** setup continues to use `GOTIFY_URLS`, `GOTIFY_CLIENT_TOKENS`, and `SECNTFY_TOKENS`.
 
 ### Default Ports
 

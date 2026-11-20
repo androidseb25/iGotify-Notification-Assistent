@@ -7,6 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddCors();
+builder.Services.AddHttpClient<GotifyRegistration>(client =>
+    {
+        client.Timeout = TimeSpan.FromSeconds(5);
+        client.MaxResponseContentBufferSize = 16 * 1024;
+    })
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false })
+    .RedactLoggedHeaders(["X-Gotify-Key"]);
 
 builder.Services.AddControllers(opt => { opt.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true; })
     .AddJsonOptions(opt =>
